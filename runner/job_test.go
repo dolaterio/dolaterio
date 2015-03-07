@@ -5,7 +5,7 @@ import "testing"
 func TestSimpleJob(t *testing.T) {
 	req := &JobRequest{
 		Image: "busybox",
-		Cmd:   []string{"echo", "\"hello world\""},
+		Cmd:   []string{"echo", "hello world"},
 	}
 	res := req.Execute(testContainerEngine)
 	stdout := string(res.Stdout)

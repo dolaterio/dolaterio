@@ -13,5 +13,9 @@ type JobResponse struct {
 
 // Execute runs the job
 func (req *JobRequest) Execute(engine containerEngine) *JobResponse {
-	return &JobResponse{}
+	container := engine.Run(req.Image, req.Cmd)
+
+	return &JobResponse{
+		Stdout: container.Stdout(),
+	}
 }

@@ -10,9 +10,13 @@ var (
 )
 
 func (*fakeContainerEngine) Run(image string, cmd []string) container {
-	return &fakeContainer{}
+	container := &fakeContainer{}
+	if cmd[0] == "echo" {
+		container.stdout = []byte(cmd[1])
+	}
+	return container
 }
 
-func (*fakeContainer) Stdout() []byte {
-	return []byte("")
+func (container *fakeContainer) Stdout() []byte {
+	return container.stdout
 }
