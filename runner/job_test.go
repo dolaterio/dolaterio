@@ -7,7 +7,7 @@ func TestSimpleJob(t *testing.T) {
 		Image: "busybox",
 		Cmd:   []string{"echo", "\"hello world\""},
 	}
-	res := req.Execute()
+	res := req.Execute(testContainerEngine)
 	stdout := string(res.Stdout)
 	if stdout != "hello world" {
 		t.Errorf("Expected \"hello world\" in the stdout, got \"%v\"", stdout)

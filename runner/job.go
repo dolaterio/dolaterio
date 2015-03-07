@@ -12,6 +12,6 @@ type JobResponse struct {
 }
 
 // Execute runs the job
-func (req *JobRequest) Execute() *JobResponse {
+func (req *JobRequest) Execute(engine containerEngine) *JobResponse {
 	return &JobResponse{}
 }
