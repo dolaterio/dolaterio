@@ -2,7 +2,9 @@ package runner
 
 import (
 	"bytes"
+	"errors"
 	"os"
+	"time"
 
 	"github.com/fsouza/go-dockerclient"
 )
@@ -17,6 +19,7 @@ type DockerContainer struct {
 }
 
 var (
+	errTimeout   = errors.New("timeout")
 	dockerClient *docker.Client
 )
 
@@ -35,6 +38,8 @@ func (*DockerContainerEngine) connect() error {
 
 // Run uses the docker engine to run a job
 func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars, stdin []byte) (container, error) {
+	var err error
+
 	engine.connect()
 
 	createContainerOpts := docker.CreateContainerOptions{
@@ -48,21 +53,22 @@ func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars
 			Cmd:        cmd,
 		},
 	}
-	c, err := dockerClient.CreateContainer(createContainerOpts)
+
+	container, err := dockerClient.CreateContainer(createContainerOpts)
 	if err != nil {
 		return nil, err
 	}
-	defer dockerClient.RemoveContainer(docker.RemoveContainerOptions{ID: c.ID, Force: true})
+	defer dockerClient.RemoveContainer(docker.RemoveContainerOptions{ID: container.ID, Force: true})
 	res := &DockerContainer{
-		containerID: c.ID,
+		containerID: container.ID,
 	}
 
-	if err := dockerClient.StartContainer(c.ID, nil); err != nil {
+	if err := dockerClient.StartContainer(container.ID, nil); err != nil {
 		return nil, err
 	}
 
 	attachContainerOpts := docker.AttachToContainerOptions{
-		Container:   c.ID,
+		Container:   container.ID,
 		InputStream: bytes.NewBuffer(stdin),
 		Stdin:       true,
 		Stream:      true,
@@ -71,12 +77,12 @@ func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars
 		return nil, err
 	}
 
-	_, err = dockerClient.WaitContainer(c.ID)
+	err = res.wait()
 	if err != nil {
 		return nil, err
 	}
 
-	c, err = dockerClient.InspectContainer(c.ID)
+	container, err = dockerClient.InspectContainer(container.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +90,7 @@ func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars
 	stdout := new(bytes.Buffer)
 
 	logs := docker.LogsOptions{
-		Container:    c.ID,
+		Container:    container.ID,
 		Stdout:       true,
 		OutputStream: stdout,
 		Tail:         "all",
@@ -100,4 +106,27 @@ func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars
 // Stdout returns the stdout of the container
 func (container *DockerContainer) Stdout() []byte {
 	return container.stdout
+}
+
+func (container *DockerContainer) wait() error {
+	done := make(chan int)
+	errChn := make(chan error)
+
+	go func() {
+		_, err := dockerClient.WaitContainer(container.containerID)
+		if err != nil {
+			errChn <- err
+		} else {
+			done <- 1
+		}
+	}()
+
+	select {
+	case <-done:
+		return nil
+	case err := <-errChn:
+		return err
+	case <-time.After(30 * time.Second):
+		return errTimeout
+	}
 }
