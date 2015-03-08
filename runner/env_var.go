@@ -1,7 +1,5 @@
 package runner
 
-import "bytes"
-
 // EnvVar wraps a environment variable sent to the container engine
 type EnvVar struct {
 	Key   string
@@ -15,11 +13,11 @@ func (envVar *EnvVar) String() string {
 	return envVar.Key + "=" + envVar.Value
 }
 
-func (envVars EnvVars) String() string {
-	var buffer bytes.Buffer
-	for _, envVar := range envVars {
-		buffer.WriteString(envVar.String())
-		buffer.WriteString("\n")
+// StringArray returns an array of strings to send as docker Env
+func (envVars EnvVars) StringArray() []string {
+	res := make([]string, len(envVars))
+	for idx, envVar := range envVars {
+		res[idx] = envVar.String()
 	}
-	return buffer.String()
+	return res
 }

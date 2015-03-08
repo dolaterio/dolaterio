@@ -13,10 +13,13 @@ type JobResponse struct {
 }
 
 // Execute runs the job
-func (req *JobRequest) Execute(engine containerEngine) *JobResponse {
-	container := engine.Run(req.Image, req.Cmd, req.Env)
+func (req *JobRequest) Execute(engine containerEngine) (*JobResponse, error) {
+	container, err := engine.Run(req.Image, req.Cmd, req.Env)
+	if err != nil {
+		return nil, err
+	}
 
 	return &JobResponse{
 		Stdout: container.Stdout(),
-	}
+	}, nil
 }
