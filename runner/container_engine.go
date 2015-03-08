@@ -1,9 +1,15 @@
 package runner
 
 type containerEngine interface {
-	Run(request *JobRequest) (container, error)
+	Connect() error
+	BuildContainer(*JobRequest) (container, error)
 }
 
 type container interface {
+	AttachStdin() error
+	Wait() error
+	Remove() error
+	FetchOutput() error
+
 	Stdout() []byte
 }

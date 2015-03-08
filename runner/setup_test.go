@@ -12,4 +12,8 @@ func init() {
 	} else {
 		testContainerEngine = &fakeContainerEngine{}
 	}
+	err := testContainerEngine.Connect()
+	if err != nil {
+		panic(err)
+	}
 }

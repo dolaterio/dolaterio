@@ -10,63 +10,31 @@ import (
 )
 
 // DockerContainerEngine is the engine to process jobs on docker
-type DockerContainerEngine struct{}
+type DockerContainerEngine struct {
+	client *docker.Client
+}
 
 // DockerContainer is a data struct representing the container status
 type DockerContainer struct {
+	engine      *DockerContainerEngine
 	containerID string
 	stdin       []byte
 	stdout      []byte
 }
 
 var (
-	errTimeout   = errors.New("timeout")
-	dockerClient *docker.Client
+	errTimeout = errors.New("timeout")
 )
 
-func (*DockerContainerEngine) connect() error {
-	if dockerClient != nil {
-		return nil
-	}
-	var err error
-	dockerClient, err = docker.NewTLSClient(
+// Connect connects to the docker host and sets the client
+func (engine *DockerContainerEngine) Connect() error {
+	c, err := docker.NewTLSClient(
 		os.Getenv("DOCKER_HOST"),
 		os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
 		os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
 		os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
+	engine.client = c
 	return err
-}
-
-// Run uses the docker engine to run a job
-func (engine *DockerContainerEngine) Run(req *JobRequest) (container, error) {
-	var err error
-	err = engine.connect()
-	if err != nil {
-		return nil, err
-	}
-
-	container, err := engine.buildContainer(req)
-	if err != nil {
-		return nil, err
-	}
-	defer container.remove()
-
-	err = container.attachStdin()
-	if err != nil {
-		return nil, err
-	}
-
-	err = container.wait()
-	if err != nil {
-		return nil, err
-	}
-
-	err = container.fetchOutput()
-	if err != nil {
-		return nil, err
-	}
-
-	return container, nil
 }
 
 // Stdout returns the stdout of the container
@@ -74,9 +42,10 @@ func (container *DockerContainer) Stdout() []byte {
 	return container.stdout
 }
 
-func (engine *DockerContainerEngine) buildContainer(req *JobRequest) (*DockerContainer, error) {
+// BuildContainer builds a DockerContainer to process the current request
+func (engine *DockerContainerEngine) BuildContainer(req *JobRequest) (container, error) {
 	var err error
-	c, err := dockerClient.CreateContainer(docker.CreateContainerOptions{
+	c, err := engine.client.CreateContainer(docker.CreateContainerOptions{
 		Config: &docker.Config{
 			Image:      req.Image,
 			Env:        req.Env.StringArray(),
@@ -91,12 +60,13 @@ func (engine *DockerContainerEngine) buildContainer(req *JobRequest) (*DockerCon
 		return nil, err
 	}
 
-	err = dockerClient.StartContainer(c.ID, nil)
+	err = engine.client.StartContainer(c.ID, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	res := &DockerContainer{
+		engine:      engine,
 		containerID: c.ID,
 		stdin:       req.Stdin,
 	}
@@ -104,8 +74,9 @@ func (engine *DockerContainerEngine) buildContainer(req *JobRequest) (*DockerCon
 	return res, nil
 }
 
-func (container *DockerContainer) attachStdin() error {
-	return dockerClient.AttachToContainer(docker.AttachToContainerOptions{
+// AttachStdin sends the stdin to the container
+func (container *DockerContainer) AttachStdin() error {
+	return container.engine.client.AttachToContainer(docker.AttachToContainerOptions{
 		Container:   container.containerID,
 		InputStream: bytes.NewBuffer(container.stdin),
 		Stdin:       true,
@@ -113,35 +84,13 @@ func (container *DockerContainer) attachStdin() error {
 	})
 }
 
-func (container *DockerContainer) remove() error {
-	return dockerClient.RemoveContainer(docker.RemoveContainerOptions{
-		ID:    container.containerID,
-		Force: true,
-	})
-}
-
-func (container *DockerContainer) fetchOutput() error {
-	stdout := new(bytes.Buffer)
-
-	err := dockerClient.Logs(docker.LogsOptions{
-		Container:    container.containerID,
-		Stdout:       true,
-		OutputStream: stdout,
-		Tail:         "all",
-	})
-	if err != nil {
-		return err
-	}
-	container.stdout = stdout.Bytes()
-	return nil
-}
-
-func (container *DockerContainer) wait() error {
+// Wait waits for the docker container to be done (or timeout in 30s)
+func (container *DockerContainer) Wait() error {
 	done := make(chan int)
 	errChn := make(chan error)
 
 	go func() {
-		_, err := dockerClient.WaitContainer(container.containerID)
+		_, err := container.engine.client.WaitContainer(container.containerID)
 		if err != nil {
 			errChn <- err
 		} else {
@@ -157,4 +106,29 @@ func (container *DockerContainer) wait() error {
 	case <-time.After(30 * time.Second):
 		return errTimeout
 	}
+}
+
+// FetchOutput retrieves the outputs from the container
+func (container *DockerContainer) FetchOutput() error {
+	stdout := new(bytes.Buffer)
+
+	err := container.engine.client.Logs(docker.LogsOptions{
+		Container:    container.containerID,
+		Stdout:       true,
+		OutputStream: stdout,
+		Tail:         "all",
+	})
+	if err != nil {
+		return err
+	}
+	container.stdout = stdout.Bytes()
+	return nil
+}
+
+// Remove removes the container from the docker host
+func (container *DockerContainer) Remove() error {
+	return container.engine.client.RemoveContainer(docker.RemoveContainerOptions{
+		ID:    container.containerID,
+		Force: true,
+	})
 }
