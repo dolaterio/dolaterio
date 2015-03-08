@@ -13,7 +13,7 @@ func TestEcho(t *testing.T) {
 		Image: "busybox",
 		Cmd:   []string{"echo", "hello world"},
 	}
-	res := req.Execute(testContainerEngine)
+	res, _ := req.Execute(testContainerEngine)
 	assertString(t, "hello world", string(res.Stdout))
 }
 
@@ -26,6 +26,6 @@ func TestEnv(t *testing.T) {
 		Cmd:   []string{"env"},
 		Env:   env,
 	}
-	res := req.Execute(testContainerEngine)
-	assertString(t, "K1=V1\nK2=V2\n", string(res.Stdout))
+	res, _ := req.Execute(testContainerEngine)
+	assertString(t, "K1=V1\nK2=V2", string(res.Stdout))
 }
