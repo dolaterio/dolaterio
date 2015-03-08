@@ -1,20 +1,26 @@
 package runner
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 type fakeContainerEngine struct{}
 type fakeContainer struct {
 	stdout []byte
 }
 
-func (*fakeContainerEngine) Run(image string, cmd []string, env EnvVars, stdin []byte) (container, error) {
+func (*fakeContainerEngine) Run(req *JobRequest) (container, error) {
 	container := &fakeContainer{}
-	if cmd[0] == "echo" {
-		container.stdout = []byte(cmd[1] + "\n")
-	} else if cmd[0] == "env" {
-		container.stdout = []byte(strings.Join(env.StringArray(), "\n"))
-	} else if cmd[0] == "cat" {
-		container.stdout = stdin
+	switch req.Cmd[0] {
+	case "echo":
+		container.stdout = []byte(req.Cmd[1] + "\n")
+	case "env":
+		container.stdout = []byte(strings.Join(req.Env.StringArray(), "\n"))
+	case "cat":
+		container.stdout = req.Stdin
+	default:
+		return nil, errors.New("Unknown command: " + req.Cmd[0])
 	}
 	return container, nil
 }

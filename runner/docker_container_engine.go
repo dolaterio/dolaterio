@@ -37,20 +37,23 @@ func (*DockerContainerEngine) connect() error {
 }
 
 // Run uses the docker engine to run a job
-func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars, stdin []byte) (container, error) {
+func (engine *DockerContainerEngine) Run(req *JobRequest) (container, error) {
 	var err error
 
-	engine.connect()
+	err = engine.connect()
+	if err != nil {
+		return nil, err
+	}
 
 	createContainerOpts := docker.CreateContainerOptions{
 		Config: &docker.Config{
-			Image:      image,
-			Env:        env.StringArray(),
+			Image:      req.Image,
+			Env:        req.Env.StringArray(),
 			Memory:     128 * 1024 * 1024, // 128 MB
 			MemorySwap: 0,
 			StdinOnce:  true,
 			OpenStdin:  true,
-			Cmd:        cmd,
+			Cmd:        req.Cmd,
 		},
 	}
 
@@ -69,7 +72,7 @@ func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars
 
 	attachContainerOpts := docker.AttachToContainerOptions{
 		Container:   container.ID,
-		InputStream: bytes.NewBuffer(stdin),
+		InputStream: bytes.NewBuffer(req.Stdin),
 		Stdin:       true,
 		Stream:      true,
 	}

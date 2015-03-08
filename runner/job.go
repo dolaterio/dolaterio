@@ -15,7 +15,7 @@ type JobResponse struct {
 
 // Execute runs the job
 func (req *JobRequest) Execute(engine containerEngine) (*JobResponse, error) {
-	container, err := engine.Run(req.Image, req.Cmd, req.Env, req.Stdin)
+	container, err := engine.Run(req)
 	if err != nil {
 		return nil, err
 	}
