@@ -20,20 +20,23 @@ var (
 	dockerClient *docker.Client
 )
 
-func init() {
+func (*DockerContainerEngine) connect() error {
+	if dockerClient != nil {
+		return nil
+	}
 	var err error
 	dockerClient, err = docker.NewTLSClient(
 		os.Getenv("DOCKER_HOST"),
 		os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
 		os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
 		os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 // Run uses the docker engine to run a job
-func (*DockerContainerEngine) Run(image string, cmd []string, env EnvVars) (container, error) {
+func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars) (container, error) {
+	engine.connect()
+
 	createContainerOpts := docker.CreateContainerOptions{
 		Config: &docker.Config{
 			Image:      image,
