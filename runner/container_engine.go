@@ -1,7 +1,7 @@
 package runner
 
 type containerEngine interface {
-	Run(image string, cmd []string, env EnvVars) (container, error)
+	Run(image string, cmd []string, env EnvVars, stdin []byte) (container, error)
 }
 
 type container interface {

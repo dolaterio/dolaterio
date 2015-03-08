@@ -4,6 +4,7 @@ package runner
 type JobRequest struct {
 	Image string
 	Cmd   []string
+	Stdin []byte
 	Env   EnvVars
 }
 
@@ -14,7 +15,7 @@ type JobResponse struct {
 
 // Execute runs the job
 func (req *JobRequest) Execute(engine containerEngine) (*JobResponse, error) {
-	container, err := engine.Run(req.Image, req.Cmd, req.Env)
+	container, err := engine.Run(req.Image, req.Cmd, req.Env, req.Stdin)
 	if err != nil {
 		return nil, err
 	}

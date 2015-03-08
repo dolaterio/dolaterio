@@ -34,7 +34,7 @@ func (*DockerContainerEngine) connect() error {
 }
 
 // Run uses the docker engine to run a job
-func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars) (container, error) {
+func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars, stdin []byte) (container, error) {
 	engine.connect()
 
 	createContainerOpts := docker.CreateContainerOptions{
@@ -45,6 +45,7 @@ func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars
 			MemorySwap: 0,
 			StdinOnce:  true,
 			OpenStdin:  true,
+			Cmd:        cmd,
 		},
 	}
 	c, err := dockerClient.CreateContainer(createContainerOpts)
@@ -59,16 +60,16 @@ func (engine *DockerContainerEngine) Run(image string, cmd []string, env EnvVars
 	if err := dockerClient.StartContainer(c.ID, nil); err != nil {
 		return nil, err
 	}
-	//
-	// attachContainerOpts := docker.AttachToContainerOptions{
-	//   Container:   c.ID,
-	//   InputStream: bytes.NewBuffer(job.Payload),
-	//   Stdin:       true,
-	//   Stream:      true,
-	// }
-	// if err := client.AttachToContainer(attachContainerOpts); err != nil {
-	//   return &JobResponse{Error: err}
-	// }
+
+	attachContainerOpts := docker.AttachToContainerOptions{
+		Container:   c.ID,
+		InputStream: bytes.NewBuffer(stdin),
+		Stdin:       true,
+		Stream:      true,
+	}
+	if err := dockerClient.AttachToContainer(attachContainerOpts); err != nil {
+		return nil, err
+	}
 
 	_, err = dockerClient.WaitContainer(c.ID)
 	if err != nil {

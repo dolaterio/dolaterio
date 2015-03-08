@@ -9,6 +9,7 @@ import (
 func main() {
 	job := runner.JobRequest{
 		Image: "dolaterio/dummy-worker",
+		Stdin: []byte("Hello world"),
 	}
 	response, err := job.Execute(&runner.DockerContainerEngine{})
 	if err != nil {
