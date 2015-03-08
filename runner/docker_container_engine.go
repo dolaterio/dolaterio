@@ -29,11 +29,17 @@ var (
 
 // Connect connects to the docker host and sets the client
 func (engine *DockerContainerEngine) Connect() error {
-	c, err := docker.NewTLSClient(
-		os.Getenv("DOCKER_HOST"),
-		os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
-		os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
-		os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
+	var c *docker.Client
+	var err error
+	if os.Getenv("DOCKER_CERT_PATH") == "" {
+		c, err = docker.NewTLSClient(
+			os.Getenv("DOCKER_HOST"),
+			os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
+			os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
+			os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
+	} else {
+		c, err = docker.NewClient(os.Getenv("DOCKER_HOST"))
+	}
 	engine.client = c
 	return err
 }
