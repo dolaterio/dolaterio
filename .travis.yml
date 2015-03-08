@@ -17,3 +17,6 @@ install:
 
 script:
   - sudo sekexe/run `pwd`/.travis.sh
+
+
+cache: apt
