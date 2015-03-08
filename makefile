@@ -2,4 +2,4 @@ default:
 	go test -v github.com/dolaterio/dolaterio/runner
 
 dep-install:
-  # go get ...
+  go get github.com/fsouza/go-dockerclient
