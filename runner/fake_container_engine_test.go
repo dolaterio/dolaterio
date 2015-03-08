@@ -7,11 +7,6 @@ type fakeContainer struct {
 	stdout []byte
 }
 
-var (
-	testContainerEngine = &fakeContainerEngine{}
-	// testContainerEngine = &DockerContainerEngine{}
-)
-
 func (*fakeContainerEngine) Run(image string, cmd []string, env EnvVars, stdin []byte) (container, error) {
 	container := &fakeContainer{}
 	if cmd[0] == "echo" {
