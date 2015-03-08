@@ -8,6 +8,7 @@ import (
 type fakeContainerEngine struct{}
 type fakeContainer struct {
 	stdout []byte
+	stderr []byte
 }
 
 func (*fakeContainerEngine) Connect() error { return nil }
@@ -16,6 +17,9 @@ func (*fakeContainerEngine) BuildContainer(req *JobRequest) (container, error) {
 	switch req.Cmd[0] {
 	case "echo":
 		container.stdout = []byte(req.Cmd[1] + "\n")
+	case "bash": // So far used only to echo to stderr
+		s := req.Cmd[2]
+		container.stderr = []byte(s[5:len(s)-4] + "\n")
 	case "env":
 		container.stdout = []byte(strings.Join(req.Env.StringArray(), "\n"))
 	case "cat":
@@ -42,4 +46,8 @@ func (container *fakeContainer) FetchOutput() error {
 
 func (container *fakeContainer) Stdout() []byte {
 	return container.stdout
+}
+
+func (container *fakeContainer) Stderr() []byte {
+	return container.stderr
 }

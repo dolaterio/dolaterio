@@ -30,6 +30,7 @@ func TestEcho(t *testing.T) {
 	res, err := req.Execute(testContainerEngine)
 	assertNil(t, err)
 	assertString(t, "hello world\n", string(res.Stdout))
+	assertString(t, "", string(res.Stderr))
 }
 
 func TestEnv(t *testing.T) {
@@ -45,6 +46,7 @@ func TestEnv(t *testing.T) {
 	assertNil(t, err)
 	assertStringContains(t, "K1=V1\n", string(res.Stdout))
 	assertStringContains(t, "K2=V2\n", string(res.Stdout))
+	assertString(t, "", string(res.Stderr))
 }
 
 func TestStdin(t *testing.T) {
@@ -56,4 +58,16 @@ func TestStdin(t *testing.T) {
 	res, err := req.Execute(testContainerEngine)
 	assertNil(t, err)
 	assertString(t, "hello world\n", string(res.Stdout))
+	assertString(t, "", string(res.Stderr))
+}
+
+func TestStderr(t *testing.T) {
+	req := &JobRequest{
+		Image: "ubuntu:14.04",
+		Cmd:   []string{"bash", "-c", "echo hello world >&2"},
+	}
+	res, err := req.Execute(testContainerEngine)
+	assertNil(t, err)
+	assertString(t, "", string(res.Stdout))
+	assertString(t, "hello world\n", string(res.Stderr))
 }

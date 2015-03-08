@@ -20,6 +20,7 @@ type DockerContainer struct {
 	containerID string
 	stdin       []byte
 	stdout      []byte
+	stderr      []byte
 }
 
 var (
@@ -40,6 +41,11 @@ func (engine *DockerContainerEngine) Connect() error {
 // Stdout returns the stdout of the container
 func (container *DockerContainer) Stdout() []byte {
 	return container.stdout
+}
+
+// Stderr returns the stderr of the container
+func (container *DockerContainer) Stderr() []byte {
+	return container.stderr
 }
 
 // BuildContainer builds a DockerContainer to process the current request
@@ -111,17 +117,21 @@ func (container *DockerContainer) Wait() error {
 // FetchOutput retrieves the outputs from the container
 func (container *DockerContainer) FetchOutput() error {
 	stdout := new(bytes.Buffer)
+	stderr := new(bytes.Buffer)
 
 	err := container.engine.client.Logs(docker.LogsOptions{
 		Container:    container.containerID,
 		Stdout:       true,
+		Stderr:       true,
 		OutputStream: stdout,
+		ErrorStream:  stderr,
 		Tail:         "all",
 	})
 	if err != nil {
 		return err
 	}
 	container.stdout = stdout.Bytes()
+	container.stderr = stderr.Bytes()
 	return nil
 }
 

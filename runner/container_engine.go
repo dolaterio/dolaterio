@@ -12,4 +12,5 @@ type container interface {
 	FetchOutput() error
 
 	Stdout() []byte
+	Stderr() []byte
 }

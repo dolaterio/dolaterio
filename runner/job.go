@@ -11,6 +11,7 @@ type JobRequest struct {
 // JobResponse models a request to run a job
 type JobResponse struct {
 	Stdout []byte
+	Stderr []byte
 }
 
 // Execute runs the job
@@ -38,5 +39,6 @@ func (req *JobRequest) Execute(engine containerEngine) (*JobResponse, error) {
 
 	return &JobResponse{
 		Stdout: container.Stdout(),
+		Stderr: container.Stderr(),
 	}, nil
 }
