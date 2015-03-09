@@ -38,13 +38,13 @@ func (engine *DockerContainerEngine) Connect() error {
 	}
 
 	if os.Getenv("DOCKER_CERT_PATH") == "" {
+		c, err = docker.NewClient(host)
+	} else {
 		c, err = docker.NewTLSClient(
 			host,
 			os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
 			os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
 			os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
-	} else {
-		c, err = docker.NewClient(host)
 	}
 	engine.client = c
 	return err
