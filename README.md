@@ -1,3 +1,3 @@
 # Dolater.io
 
-[![Build Status](https://travis-ci.org/dolaterio/dolaterio.svg)](https://travis-ci.org/dolaterio/dolaterio)
+[![Circle CI](https://circleci.com/gh/dolaterio/dolaterio.svg?style=svg)](https://circleci.com/gh/dolaterio/dolaterio)
