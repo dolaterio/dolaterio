@@ -63,6 +63,12 @@ func (container *DockerContainer) Stderr() []byte {
 // BuildContainer builds a DockerContainer to process the current request
 func (engine *DockerContainerEngine) BuildContainer(req *JobRequest) (container, error) {
 	var err error
+	err = engine.client.PullImage(docker.PullImageOptions{
+		Repository: req.Image,
+	}, docker.AuthConfiguration{})
+	if err != nil {
+		return nil, err
+	}
 	c, err := engine.client.CreateContainer(docker.CreateContainerOptions{
 		Config: &docker.Config{
 			Image:      req.Image,
