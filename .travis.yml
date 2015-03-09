@@ -13,7 +13,7 @@ install:
   - git clone git://github.com/jpetazzo/sekexe
 
 script:
-  - sudo sekexe/run `pwd`/.travis.sh
+  - sekexe/run `pwd`/.travis.sh
 
 
 cache: apt
