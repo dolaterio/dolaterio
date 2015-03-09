@@ -31,14 +31,20 @@ var (
 func (engine *DockerContainerEngine) Connect() error {
 	var c *docker.Client
 	var err error
+
+	host := os.Getenv("DOCKER_HOST")
+	if host == "" {
+		host = "unix:///var/run/docker.sock"
+	}
+
 	if os.Getenv("DOCKER_CERT_PATH") == "" {
 		c, err = docker.NewTLSClient(
-			os.Getenv("DOCKER_HOST"),
+			host,
 			os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
 			os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
 			os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
 	} else {
-		c, err = docker.NewClient(os.Getenv("DOCKER_HOST"))
+		c, err = docker.NewClient(host)
 	}
 	engine.client = c
 	return err
