@@ -7,11 +7,14 @@ import (
 )
 
 func main() {
+	engine := &runner.DockerContainerEngine{}
+	engine.Connect()
+
 	job := runner.JobRequest{
 		Image: "dolaterio/dummy-worker",
 		Stdin: []byte("Hello world"),
 	}
-	response, err := job.Execute(&runner.DockerContainerEngine{})
+	response, err := job.Execute(engine)
 	if err != nil {
 		panic(err)
 	}
