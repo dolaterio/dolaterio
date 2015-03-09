@@ -29,11 +29,23 @@ var (
 
 // Connect connects to the docker host and sets the client
 func (engine *DockerContainerEngine) Connect() error {
-	c, err := docker.NewTLSClient(
-		os.Getenv("DOCKER_HOST"),
-		os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
-		os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
-		os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
+	var c *docker.Client
+	var err error
+
+	host := os.Getenv("DOCKER_HOST")
+	if host == "" {
+		host = "unix:///var/run/docker.sock"
+	}
+
+	if os.Getenv("DOCKER_CERT_PATH") == "" {
+		c, err = docker.NewClient(host)
+	} else {
+		c, err = docker.NewTLSClient(
+			host,
+			os.Getenv("DOCKER_CERT_PATH")+"/cert.pem",
+			os.Getenv("DOCKER_CERT_PATH")+"/key.pem",
+			os.Getenv("DOCKER_CERT_PATH")+"/ca.pem")
+	}
 	engine.client = c
 	return err
 }
@@ -51,6 +63,12 @@ func (container *DockerContainer) Stderr() []byte {
 // BuildContainer builds a DockerContainer to process the current request
 func (engine *DockerContainerEngine) BuildContainer(req *JobRequest) (container, error) {
 	var err error
+	err = engine.client.PullImage(docker.PullImageOptions{
+		Repository: req.Image,
+	}, docker.AuthConfiguration{})
+	if err != nil {
+		return nil, err
+	}
 	c, err := engine.client.CreateContainer(docker.CreateContainerOptions{
 		Config: &docker.Config{
 			Image:      req.Image,

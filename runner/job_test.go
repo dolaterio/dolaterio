@@ -24,7 +24,7 @@ func assertNil(t *testing.T, v interface{}) {
 
 func TestEcho(t *testing.T) {
 	req := &JobRequest{
-		Image: "busybox",
+		Image: "ubuntu:14.04",
 		Cmd:   []string{"echo", "hello world"},
 	}
 	res, err := req.Execute(testContainerEngine)
@@ -38,7 +38,7 @@ func TestEnv(t *testing.T) {
 	env[0] = EnvVar{Key: "K1", Value: "V1"}
 	env[1] = EnvVar{Key: "K2", Value: "V2"}
 	req := &JobRequest{
-		Image: "busybox",
+		Image: "ubuntu:14.04",
 		Cmd:   []string{"env"},
 		Env:   env,
 	}
@@ -51,7 +51,7 @@ func TestEnv(t *testing.T) {
 
 func TestStdin(t *testing.T) {
 	req := &JobRequest{
-		Image: "busybox",
+		Image: "ubuntu:14.04",
 		Cmd:   []string{"cat"},
 		Stdin: []byte("hello world\n"),
 	}

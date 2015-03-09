@@ -1,4 +1,4 @@
-default: test-stub test-docker
+test: test-stub test-docker
 
 test-stub:
 	go test -v github.com/dolaterio/dolaterio/runner

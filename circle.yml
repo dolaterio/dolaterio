@@ -1,0 +1,12 @@
+machine:
+  services:
+    - docker
+
+test:
+  override:
+    - make test
+
+dependencies:
+  pre:
+    - docker pull busybox
+    - docker pull ubuntu:14.04
