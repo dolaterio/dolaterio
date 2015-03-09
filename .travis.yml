@@ -7,12 +7,9 @@ install:
   - make dep-install
   - sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
   - sudo sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
-  - sudo add-apt-repository -y ppa:chris-lea/node.js
-  - sudo apt-get update
   - echo exit 101 | sudo tee /usr/sbin/policy-rc.d
   - sudo chmod +x /usr/sbin/policy-rc.d
   - sudo apt-get install -qy slirp lxc lxc-docker
-  - sudo apt-get install -qy python-software-properties python g++ make nodejs
   - git clone git://github.com/jpetazzo/sekexe
 
 script:
