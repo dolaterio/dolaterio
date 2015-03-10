@@ -50,14 +50,9 @@ func (engine *DockerContainerEngine) Connect() error {
 	return err
 }
 
-// Stdout returns the stdout of the container
-func (container *DockerContainer) Stdout() []byte {
-	return container.stdout
-}
-
-// Stderr returns the stderr of the container
-func (container *DockerContainer) Stderr() []byte {
-	return container.stderr
+// Timeout returns the default timeout
+func (engine *DockerContainerEngine) Timeout() time.Duration {
+	return 30 * time.Second
 }
 
 // BuildContainer builds a DockerContainer to process the current request
@@ -100,6 +95,9 @@ func (engine *DockerContainerEngine) BuildContainer(req *JobRequest) (container,
 
 // AttachStdin sends the stdin to the container
 func (container *DockerContainer) AttachStdin() error {
+	if container.stdin == nil {
+		return nil
+	}
 	return container.engine.client.AttachToContainer(docker.AttachToContainerOptions{
 		Container:   container.containerID,
 		InputStream: bytes.NewBuffer(container.stdin),
@@ -110,26 +108,8 @@ func (container *DockerContainer) AttachStdin() error {
 
 // Wait waits for the docker container to be done (or timeout in 30s)
 func (container *DockerContainer) Wait() error {
-	done := make(chan int)
-	errChn := make(chan error)
-
-	go func() {
-		_, err := container.engine.client.WaitContainer(container.containerID)
-		if err != nil {
-			errChn <- err
-		} else {
-			done <- 1
-		}
-	}()
-
-	select {
-	case <-done:
-		return nil
-	case err := <-errChn:
-		return err
-	case <-time.After(30 * time.Second):
-		return errTimeout
-	}
+	_, err := container.engine.client.WaitContainer(container.containerID)
+	return err
 }
 
 // FetchOutput retrieves the outputs from the container
@@ -159,4 +139,14 @@ func (container *DockerContainer) Remove() error {
 		ID:    container.containerID,
 		Force: true,
 	})
+}
+
+// Stdout returns the stdout of the container
+func (container *DockerContainer) Stdout() []byte {
+	return container.stdout
+}
+
+// Stderr returns the stderr of the container
+func (container *DockerContainer) Stderr() []byte {
+	return container.stderr
 }

@@ -1,6 +1,9 @@
 package dolaterio
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestEcho(t *testing.T) {
 	req := &JobRequest{
@@ -50,4 +53,16 @@ func TestStderr(t *testing.T) {
 	assertNil(t, err)
 	assertString(t, "", string(res.Stdout))
 	assertString(t, "hello world\n", string(res.Stderr))
+}
+
+func TestTimeout(t *testing.T) {
+	req := &JobRequest{
+		Image:   "ubuntu:14.04",
+		Cmd:     []string{"sleep", "2000"},
+		Timeout: 1 * time.Millisecond,
+	}
+	_, err := req.Execute(testContainerEngine)
+	assertNotNil(t, err)
+	assertString(t, errTimeout.Error(), err.Error())
+	// assertNil(t, res)
 }

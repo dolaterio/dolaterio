@@ -56,5 +56,4 @@ func TestStopWhileWaiting(t *testing.T) {
 		Cmd:   []string{"sleep", "1"},
 	})
 	assertNotNil(t, err)
-	runner.Stop()
 }
