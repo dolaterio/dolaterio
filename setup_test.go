@@ -1,4 +1,4 @@
-package runner
+package dolaterio
 
 import (
 	"os"
@@ -37,12 +37,6 @@ func assertStringContains(t *testing.T, s1, s2 string) {
 func assertNil(t *testing.T, v interface{}) {
 	if v != nil {
 		t.Errorf("Expected \"%v\" to be nil", v)
-	}
-}
-
-func assertMinDuration(t *testing.T, d1, d2 time.Duration) {
-	if d2 < d1 {
-		t.Errorf("Expected %0.4fs to be longer than %0.4fs", d2.Seconds(), d1.Seconds())
 	}
 }
 

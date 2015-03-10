@@ -1,16 +1,14 @@
-package main
+package dolaterio
 
 import (
 	"fmt"
-
-	"github.com/dolaterio/dolaterio/runner"
 )
 
 func main() {
-	engine := &runner.DockerContainerEngine{}
+	engine := &DockerContainerEngine{}
 	engine.Connect()
 
-	job := runner.JobRequest{
+	job := JobRequest{
 		Image: "dolaterio/dummy-worker",
 		Stdin: []byte("Hello world"),
 	}

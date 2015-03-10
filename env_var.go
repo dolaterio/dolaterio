@@ -1,4 +1,4 @@
-package runner
+package dolaterio
 
 // EnvVar wraps a environment variable sent to the container engine
 type EnvVar struct {

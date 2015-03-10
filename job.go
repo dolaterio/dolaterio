@@ -1,4 +1,4 @@
-package runner
+package dolaterio
 
 // JobRequest models a request to run a job
 type JobRequest struct {
