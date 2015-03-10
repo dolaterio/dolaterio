@@ -8,7 +8,7 @@ import (
 func TestSimpleProcess(t *testing.T) {
 	runner, err := NewRunner(&RunnerOptions{
 		Engine:      testContainerEngine,
-		Concurrency: 1,
+		Concurrency: 10,
 	})
 	assertNil(t, err)
 	err = runner.Process(&JobRequest{
@@ -41,5 +41,20 @@ func TestParallelProcess(t *testing.T) {
 		assertNil(t, err)
 	}
 	assertMaxDuration(t, 4*time.Second, time.Since(begin))
+	runner.Stop()
+}
+
+func TestStopWhileWaiting(t *testing.T) {
+	runner, err := NewRunner(&RunnerOptions{
+		Engine:      testContainerEngine,
+		Concurrency: 10,
+	})
+	assertNil(t, err)
+	runner.Stop()
+	err = runner.Process(&JobRequest{
+		Image: "ubuntu:14.04",
+		Cmd:   []string{"sleep", "1"},
+	})
+	assertNotNil(t, err)
 	runner.Stop()
 }

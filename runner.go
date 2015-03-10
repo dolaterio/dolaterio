@@ -1,11 +1,14 @@
 package dolaterio
 
+import "errors"
+
 // Runner models a job runner
 type Runner struct {
 	engine    containerEngine
 	queue     chan *JobRequest
 	responses chan *JobResponse
 	stop      chan bool
+	stopped   bool
 }
 
 // RunnerOptions models the data required to initialize a Runner
@@ -13,6 +16,10 @@ type RunnerOptions struct {
 	Engine      containerEngine
 	Concurrency int
 }
+
+var (
+	errRunnerStopped = errors.New("this runner is stopped")
+)
 
 // NewRunner build and initializes a runner
 func NewRunner(options *RunnerOptions) (*Runner, error) {
@@ -30,12 +37,16 @@ func NewRunner(options *RunnerOptions) (*Runner, error) {
 
 // Process processes the job.
 func (runner *Runner) Process(req *JobRequest) error {
+	if runner.stopped {
+		return errRunnerStopped
+	}
 	runner.queue <- req
 	return nil
 }
 
 // Stop stops the job runner
 func (runner *Runner) Stop() {
+	runner.stopped = true
 	for i := 0; i < cap(runner.queue); i++ {
 		runner.stop <- true
 	}
