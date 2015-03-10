@@ -2,7 +2,9 @@ package runner
 
 import (
 	"errors"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type fakeContainerEngine struct{}
@@ -24,6 +26,9 @@ func (*fakeContainerEngine) BuildContainer(req *JobRequest) (container, error) {
 		container.stdout = []byte(strings.Join(req.Env.StringArray(), "\n"))
 	case "cat":
 		container.stdout = req.Stdin
+	case "sleep":
+		seconds, _ := strconv.ParseFloat(req.Cmd[1], 64)
+		time.Sleep(time.Duration(seconds*1000.0) * time.Millisecond)
 	default:
 		return nil, errors.New("Unknown command: " + req.Cmd[0])
 	}

@@ -1,26 +1,6 @@
 package runner
 
-import (
-	"strings"
-	"testing"
-)
-
-func assertString(t *testing.T, s1, s2 string) {
-	if s1 != s2 {
-		t.Errorf("Expected \"%s\", got \"%v\"", s1, s2)
-	}
-}
-func assertStringContains(t *testing.T, s1, s2 string) {
-	if strings.Contains(s1, s2) {
-		t.Errorf("Expected \"%s\" to contain \"%v\"", s2, s1)
-	}
-}
-
-func assertNil(t *testing.T, v interface{}) {
-	if v != nil {
-		t.Errorf("Expected \"%v\" to be nil", v)
-	}
-}
+import "testing"
 
 func TestEcho(t *testing.T) {
 	req := &JobRequest{
