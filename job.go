@@ -18,7 +18,7 @@ type JobResponse struct {
 }
 
 // Execute runs the job
-func (req *JobRequest) Execute(engine containerEngine) (*JobResponse, error) {
+func (req *JobRequest) Execute(engine ContainerEngine) (*JobResponse, error) {
 	container, err := engine.BuildContainer(req)
 	if err != nil {
 		return nil, err

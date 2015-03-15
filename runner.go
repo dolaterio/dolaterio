@@ -4,7 +4,7 @@ import "errors"
 
 // Runner models a job runner
 type Runner struct {
-	engine    containerEngine
+	engine    ContainerEngine
 	queue     chan *JobRequest
 	responses chan *JobResponse
 	stop      chan bool
@@ -13,7 +13,7 @@ type Runner struct {
 
 // RunnerOptions models the data required to initialize a Runner
 type RunnerOptions struct {
-	Engine      containerEngine
+	Engine      ContainerEngine
 	Concurrency int
 }
 
