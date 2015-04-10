@@ -1,65 +1,39 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
+	"github.com/dancannon/gorethink"
 	"github.com/dolaterio/dolaterio/core"
-	"github.com/gorilla/mux"
 )
 
-type jobObjectRequest struct {
-	DockerImage string `json:"docker_image"`
+type apiData struct {
+	Handler   http.Handler
+	Engine    dolaterio.ContainerEngine
+	Runner    *dolaterio.Runner
+	DbSession *gorethink.Session
 }
 
-type jobCreatedResponse struct {
-	Created bool `json:"created"`
-	ID      bool `json:"id"`
-}
+var Api = &apiData{}
 
-type jobShowResponse struct {
-	Stdout string `json:"stdout"`
-	Stderr string `json:"stderr"`
-}
+func init() {
+	Api.DbSession = connectDb()
 
-// Handler returns the http handler to serve the dolater.io API
-func Handler(runner *dolaterio.Runner) http.Handler {
-	r := mux.NewRouter()
-	v1 := r.PathPrefix("/v1").Subrouter()
-
-	tasks := v1.PathPrefix("/tasks").Subrouter()
-	tasks.Methods("POST").HandlerFunc(tasksCreateHandler(runner))
-	tasks.Methods("GET").HandlerFunc(tasksIndexHandler(runner))
-	return r
-}
-
-func tasksCreateHandler(runner *dolaterio.Runner) func(http.ResponseWriter, *http.Request) {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		decoder := json.NewDecoder(r.Body)
-		var job jobObjectRequest
-		decoder.Decode(&job)
-		// TODO: Do something with `job`
-
-		runner.Process(&dolaterio.JobRequest{
-			Image: job.DockerImage,
-		})
-
-		rw.Header().Set("Content-Type", "application/json")
-		encoder := json.NewEncoder(rw)
-		encoder.Encode(&jobCreatedResponse{
-			Created: true,
-		})
+	docker := &dolaterio.DockerContainerEngine{}
+	err := docker.Connect()
+	if err != nil {
+		panic(err)
 	}
-}
-func tasksIndexHandler(runner *dolaterio.Runner) func(http.ResponseWriter, *http.Request) {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		job, _ := runner.Response()
+	Api.Engine = docker
 
-		rw.Header().Set("Content-Type", "application/json")
-		encoder := json.NewEncoder(rw)
-		encoder.Encode(&jobShowResponse{
-			Stdout: string(job.Stdout),
-			Stderr: string(job.Stderr),
-		})
+	runner, err := dolaterio.NewRunner(&dolaterio.RunnerOptions{
+		Concurrency: 10,
+		Engine:      Api.Engine,
+	})
+	if err != nil {
+		panic(err)
 	}
+	Api.Runner = runner
+
+	Api.Handler = handler()
 }
