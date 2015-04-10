@@ -9,30 +9,14 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
-type ContainerEngine interface {
-	Connect() error
-	BuildContainer(*JobRequest) (Container, error)
-	Timeout() time.Duration
-}
-
-type Container interface {
-	AttachStdin() error
-	Wait() error
-	Remove() error
-	FetchOutput() error
-
-	Stdout() []byte
-	Stderr() []byte
-}
-
-// DockerContainerEngine is the engine to process jobs on docker
-type DockerContainerEngine struct {
+// ContainerEngine is the engine to process jobs on docker
+type ContainerEngine struct {
 	client *docker.Client
 }
 
-// DockerContainer is a data struct representing the container status
-type DockerContainer struct {
-	engine      *DockerContainerEngine
+// Container is a data struct representing the container status
+type Container struct {
+	engine      *ContainerEngine
 	containerID string
 	stdin       []byte
 	stdout      []byte
@@ -44,7 +28,7 @@ var (
 )
 
 // Connect connects to the docker host and sets the client
-func (engine *DockerContainerEngine) Connect() error {
+func (engine *ContainerEngine) Connect() error {
 	var c *docker.Client
 	var err error
 
@@ -67,12 +51,12 @@ func (engine *DockerContainerEngine) Connect() error {
 }
 
 // Timeout returns the default timeout
-func (engine *DockerContainerEngine) Timeout() time.Duration {
+func (engine *ContainerEngine) Timeout() time.Duration {
 	return 30 * time.Second
 }
 
-// BuildContainer builds a DockerContainer to process the current request
-func (engine *DockerContainerEngine) BuildContainer(req *JobRequest) (Container, error) {
+// BuildContainer builds a Container to process the current request
+func (engine *ContainerEngine) BuildContainer(req *JobRequest) (*Container, error) {
 	var err error
 	// err = engine.client.PullImage(docker.PullImageOptions{
 	// 	Repository: req.Image,
@@ -100,7 +84,7 @@ func (engine *DockerContainerEngine) BuildContainer(req *JobRequest) (Container,
 		return nil, err
 	}
 
-	res := &DockerContainer{
+	res := &Container{
 		engine:      engine,
 		containerID: c.ID,
 		stdin:       req.Stdin,
@@ -110,7 +94,7 @@ func (engine *DockerContainerEngine) BuildContainer(req *JobRequest) (Container,
 }
 
 // AttachStdin sends the stdin to the container
-func (container *DockerContainer) AttachStdin() error {
+func (container *Container) AttachStdin() error {
 	if container.stdin == nil {
 		return nil
 	}
@@ -123,13 +107,13 @@ func (container *DockerContainer) AttachStdin() error {
 }
 
 // Wait waits for the docker container to be done (or timeout in 30s)
-func (container *DockerContainer) Wait() error {
+func (container *Container) Wait() error {
 	_, err := container.engine.client.WaitContainer(container.containerID)
 	return err
 }
 
 // FetchOutput retrieves the outputs from the container
-func (container *DockerContainer) FetchOutput() error {
+func (container *Container) FetchOutput() error {
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
 
@@ -150,7 +134,7 @@ func (container *DockerContainer) FetchOutput() error {
 }
 
 // Remove removes the container from the docker host
-func (container *DockerContainer) Remove() error {
+func (container *Container) Remove() error {
 	return container.engine.client.RemoveContainer(docker.RemoveContainerOptions{
 		ID:    container.containerID,
 		Force: true,
@@ -158,11 +142,11 @@ func (container *DockerContainer) Remove() error {
 }
 
 // Stdout returns the stdout of the container
-func (container *DockerContainer) Stdout() []byte {
+func (container *Container) Stdout() []byte {
 	return container.stdout
 }
 
 // Stderr returns the stderr of the container
-func (container *DockerContainer) Stderr() []byte {
+func (container *Container) Stderr() []byte {
 	return container.stderr
 }

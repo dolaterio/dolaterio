@@ -10,7 +10,7 @@ import (
 
 type apiData struct {
 	Handler   http.Handler
-	Engine    dolaterio.ContainerEngine
+	Engine    *dolaterio.ContainerEngine
 	Runner    *dolaterio.Runner
 	DbSession *gorethink.Session
 }
@@ -20,7 +20,7 @@ var Api = &apiData{}
 func init() {
 	Api.DbSession = connectDb()
 
-	docker := &dolaterio.DockerContainerEngine{}
+	docker := &dolaterio.ContainerEngine{}
 	err := docker.Connect()
 	if err != nil {
 		panic(err)
