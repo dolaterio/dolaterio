@@ -7,22 +7,21 @@ import (
 )
 
 var (
+	// Runner is the dolater job runner
 	Runner *dolaterio.Runner
-	Engine *dolaterio.ContainerEngine
 )
 
-// Initializes a new API
+// Initialize a new API
 func Initialize() error {
 	docker := &dolaterio.ContainerEngine{}
 	err := docker.Connect()
 	if err != nil {
 		return err
 	}
-	Engine = docker
 
 	runner, err := dolaterio.NewRunner(&dolaterio.RunnerOptions{
 		Concurrency: 10,
-		Engine:      Engine,
+		Engine:      docker,
 	})
 	if err != nil {
 		return err
