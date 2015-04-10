@@ -1,9 +1,12 @@
-test: test-stub test-docker
+test: test-core-stub test-core-docker
 
-test-stub:
+test-api:
+	go test -v github.com/dolaterio/dolaterio/api
+
+test-core-stub:
 	go test -v github.com/dolaterio/dolaterio/core
 
-test-docker:
+test-core-docker:
 	USE_DOCKER=1 go test -v github.com/dolaterio/dolaterio/core
 
 dep-install:
