@@ -13,15 +13,15 @@ type jobObjectRequest struct {
 	DockerImage string `json:"docker_image"`
 }
 
-// handler returns the http handler to serve the dolater.io API
-func handler() http.Handler {
+// Handler returns the http handler to serve the dolater.io API
+func Handler() (http.Handler, error) {
 	r := mux.NewRouter()
 	v1 := r.PathPrefix("/v1").Subrouter()
 
 	tasks := v1.PathPrefix("/tasks").Subrouter()
 	tasks.Methods("POST").HandlerFunc(tasksCreateHandler)
 	tasks.Methods("GET").Path("/{id}").HandlerFunc(tasksIndexHandler)
-	return r
+	return r, nil
 }
 
 func tasksCreateHandler(res http.ResponseWriter, req *http.Request) {
@@ -37,7 +37,7 @@ func tasksCreateHandler(res http.ResponseWriter, req *http.Request) {
 		fmt.Println(err)
 	}
 
-	Api.Runner.Process(&dolaterio.JobRequest{
+	Runner.Process(&dolaterio.JobRequest{
 		ID:    job.ID,
 		Image: job.DockerImage,
 	})

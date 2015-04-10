@@ -7,8 +7,11 @@ dep-install:
 	go get "github.com/gorilla/mux"
 	go get "github.com/dancannon/gorethink"
 
-run:
-	go get github.com/dolaterio/dolaterio && $$GOPATH/bin/dolaterio
+build:
+	go get github.com/dolaterio/dolaterio
+
+run: build
+	$$GOPATH/bin/dolaterio -rhost d.lo
 
 3rd-party-tools:
 	docker run --restart always -d -p 8080:8080 -p 28015:28015 -p 29015:29015 --name dolaterio-rethinkdb rethinkdb:1.16

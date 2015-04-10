@@ -10,7 +10,7 @@ type Job struct {
 
 // CreateJob inserts the job into the db
 func CreateJob(job *Job) error {
-	res, err := JobTable.Insert(job).RunWrite(Session)
+	res, err := JobTable.Insert(job).RunWrite(S)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func CreateJob(job *Job) error {
 
 // GetJob returns a job from the db
 func GetJob(id string) (*Job, error) {
-	res, err := JobTable.Get(id).Run(Session)
+	res, err := JobTable.Get(id).Run(S)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func GetJob(id string) (*Job, error) {
 
 // SaveJob returns a job from the db
 func SaveJob(job *Job) (bool, error) {
-	res, err := JobTable.Update(job).RunWrite(Session)
+	res, err := JobTable.Update(job).RunWrite(S)
 	if err != nil {
 		return false, err
 	}

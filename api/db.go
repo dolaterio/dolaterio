@@ -1,50 +1,45 @@
 package api
 
 import (
-	"os"
+	"fmt"
 
 	"github.com/dancannon/gorethink"
 )
 
-// Session Represents the database session
-var Session *gorethink.Session
+var (
+	// S Represents the database session
+	S *gorethink.Session
 
-// Db Represents the db
-var Db gorethink.Term
+	// Db Represents the db
+	Db gorethink.Term
 
-// JobTable represents the jobs table
-var JobTable gorethink.Term
+	// JobTable represents the jobs table
+	JobTable gorethink.Term
+)
 
-func connectDb() *gorethink.Session {
-	rdbHost := os.Getenv("RETHINKDB_PORT_28015_TCP_ADDR")
-	if rdbHost == "" {
-		rdbHost = "d.lo"
-	}
-	rdbPort := os.Getenv("RETHINKDB_PORT_28015_TCP_PORT")
-	if rdbPort == "" {
-		rdbPort = "28015"
-	}
-
+// ConnectDb initializes the DB connection
+func ConnectDb(rdbHost, rdbPort string) error {
+	rdbAddress := fmt.Sprintf("%v:%v", rdbHost, rdbPort)
 	session, err := gorethink.Connect(gorethink.ConnectOpts{
-		Address:  rdbHost + ":" + rdbPort,
+		Address:  rdbAddress,
 		Database: "dolaterio",
 		MaxIdle:  10,
 		MaxOpen:  10,
 	})
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	session.SetMaxOpenConns(5)
 
-	Session = session
+	S = session
 
-	gorethink.DbCreate("dolaterio").RunWrite(Session)
+	gorethink.DbCreate("dolaterio").RunWrite(S)
 	Db = gorethink.Db("dolaterio")
 
-	Db.TableCreate("jobs").RunWrite(Session)
+	Db.TableCreate("jobs").RunWrite(S)
 	JobTable = Db.Table("jobs")
 
-	return session
+	return nil
 }
