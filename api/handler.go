@@ -5,16 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dolaterio/dolaterio/core"
 	"github.com/gorilla/mux"
 )
 
 type jobObjectRequest struct {
 	DockerImage string `json:"docker_image"`
-}
-
-type jobCreatedResponse struct {
-	Created bool   `json:"created"`
-	ID      string `json:"id"`
 }
 
 // handler returns the http handler to serve the dolater.io API
@@ -30,27 +26,23 @@ func handler() http.Handler {
 
 func tasksCreateHandler(res http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
-	var job jobObjectRequest
-	decoder.Decode(&job)
-	// TODO: Do something with `job`
+	var jobReq jobObjectRequest
+	decoder.Decode(&jobReq)
 
-	id, err := CreateJob(&Job{
-		DockerImage: job.DockerImage,
-	})
+	job := &Job{
+		DockerImage: jobReq.DockerImage,
+	}
+	err := CreateJob(job)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// Api.Runner.Process(&dolaterio.JobRequest{
-	// 	Image: job.DockerImage,
-	// })
-
-	res.Header().Set("Content-Type", "application/json")
-	encoder := json.NewEncoder(res)
-	encoder.Encode(&jobCreatedResponse{
-		Created: true,
-		ID:      id,
+	Api.Runner.Process(&dolaterio.JobRequest{
+		ID:    job.ID,
+		Image: job.DockerImage,
 	})
+
+	renderJob(res, job)
 }
 
 func tasksIndexHandler(res http.ResponseWriter, req *http.Request) {
@@ -60,8 +52,11 @@ func tasksIndexHandler(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	// job, _ := Api.Runner.Response()
 
+	renderJob(res, job)
+}
+
+func renderJob(res http.ResponseWriter, job *Job) {
 	res.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(res)
 	encoder.Encode(job)

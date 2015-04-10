@@ -4,6 +4,7 @@ import "time"
 
 // JobRequest models a request to run a job
 type JobRequest struct {
+	ID      string
 	Image   string
 	Cmd     []string
 	Stdin   []byte
@@ -13,6 +14,7 @@ type JobRequest struct {
 
 // JobResponse models a request to run a job
 type JobResponse struct {
+	ID     string
 	Stdout []byte
 	Stderr []byte
 }
@@ -61,6 +63,7 @@ func (req *JobRequest) Execute(engine ContainerEngine) (*JobResponse, error) {
 	}
 
 	return &JobResponse{
+		ID:     req.ID,
 		Stdout: container.Stdout(),
 		Stderr: container.Stderr(),
 	}, nil

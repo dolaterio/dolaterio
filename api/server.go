@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/dancannon/gorethink"
@@ -36,4 +37,15 @@ func init() {
 	Api.Runner = runner
 
 	Api.Handler = handler()
+
+	go func() {
+		for {
+			job, _ := Api.Runner.Response()
+			dbJob, _ := GetJob(job.ID)
+			dbJob.Stdout = string(job.Stdout)
+			dbJob.Stderr = string(job.Stderr)
+			SaveJob(dbJob)
+			fmt.Println("Finished Job " + job.ID)
+		}
+	}()
 }
