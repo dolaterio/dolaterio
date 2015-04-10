@@ -10,13 +10,17 @@ import (
 )
 
 func TestCreateAndFetchJob(t *testing.T) {
+	Initialize()
+	ConnectDb("d.lo", "28015")
+	handler, _ := Handler()
+
 	var job Job
 
 	req, _ := http.NewRequest("POST", "/v1/tasks",
 		bytes.NewBufferString("{\"docker_image\":\"dolaterio/dummy-worker\"}"))
 
 	w := httptest.NewRecorder()
-	Api.Handler.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 
 	decoder := json.NewDecoder(w.Body)
 	decoder.Decode(&job)
@@ -31,7 +35,7 @@ func TestCreateAndFetchJob(t *testing.T) {
 	req, _ = http.NewRequest("GET", "/v1/tasks/"+job.ID, nil)
 
 	w = httptest.NewRecorder()
-	Api.Handler.ServeHTTP(w, req)
+	handler.ServeHTTP(w, req)
 	decoder = json.NewDecoder(w.Body)
 	decoder.Decode(&job)
 
