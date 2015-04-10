@@ -4,8 +4,8 @@ import "fmt"
 
 // Job is the model struct for jobs
 type Job struct {
-	ID          string `gorethink:"id,omitempty"`
-	DockerImage string `gorethink:"docker_image"`
+	ID          string `gorethink:"id,omitempty" json:"id"`
+	DockerImage string `gorethink:"docker_image" json:"docker_image"`
 }
 
 // CreateJob inserts the job into the db

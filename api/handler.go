@@ -17,11 +17,6 @@ type jobCreatedResponse struct {
 	ID      string `json:"id"`
 }
 
-type jobShowResponse struct {
-	Stdout string `json:"stdout"`
-	Stderr string `json:"stderr"`
-}
-
 // handler returns the http handler to serve the dolater.io API
 func handler() http.Handler {
 	r := mux.NewRouter()
@@ -29,12 +24,12 @@ func handler() http.Handler {
 
 	tasks := v1.PathPrefix("/tasks").Subrouter()
 	tasks.Methods("POST").HandlerFunc(tasksCreateHandler)
-	tasks.Methods("GET").HandlerFunc(tasksIndexHandler)
+	tasks.Methods("GET").Path("/{id}").HandlerFunc(tasksIndexHandler)
 	return r
 }
 
-func tasksCreateHandler(rw http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+func tasksCreateHandler(res http.ResponseWriter, req *http.Request) {
+	decoder := json.NewDecoder(req.Body)
 	var job jobObjectRequest
 	decoder.Decode(&job)
 	// TODO: Do something with `job`
@@ -50,21 +45,24 @@ func tasksCreateHandler(rw http.ResponseWriter, r *http.Request) {
 	// 	Image: job.DockerImage,
 	// })
 
-	rw.Header().Set("Content-Type", "application/json")
-	encoder := json.NewEncoder(rw)
+	res.Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(res)
 	encoder.Encode(&jobCreatedResponse{
 		Created: true,
 		ID:      id,
 	})
 }
 
-func tasksIndexHandler(rw http.ResponseWriter, r *http.Request) {
-	job, _ := Api.Runner.Response()
+func tasksIndexHandler(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	job, err := GetJob(vars["id"])
 
-	rw.Header().Set("Content-Type", "application/json")
-	encoder := json.NewEncoder(rw)
-	encoder.Encode(&jobShowResponse{
-		Stdout: string(job.Stdout),
-		Stderr: string(job.Stderr),
-	})
+	if err != nil {
+		fmt.Println(err)
+	}
+	// job, _ := Api.Runner.Response()
+
+	res.Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(res)
+	encoder.Encode(job)
 }
