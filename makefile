@@ -1,10 +1,10 @@
 test: test-stub test-docker
 
 test-stub:
-	go test -v github.com/dolaterio/dolaterio
+	go test -v github.com/dolaterio/dolaterio/core
 
 test-docker:
-	USE_DOCKER=1 go test -v github.com/dolaterio/dolaterio
+	USE_DOCKER=1 go test -v github.com/dolaterio/dolaterio/core
 
 dep-install:
 	go get "github.com/fsouza/go-dockerclient"
