@@ -39,8 +39,8 @@ func GetJob(id string) (*Job, error) {
 	return &job, nil
 }
 
-// SaveJob returns a job from the db
-func SaveJob(job *Job) (bool, error) {
+// UpdateJob returns a job from the db
+func UpdateJob(job *Job) (bool, error) {
 	res, err := JobTable.Update(job).RunWrite(S)
 	if err != nil {
 		return false, err

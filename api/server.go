@@ -34,7 +34,7 @@ func Initialize() error {
 			dbJob, _ := GetJob(job.ID)
 			dbJob.Stdout = string(job.Stdout)
 			dbJob.Stderr = string(job.Stderr)
-			SaveJob(dbJob)
+			UpdateJob(dbJob)
 			fmt.Println("Finished Job " + job.ID)
 		}
 	}()

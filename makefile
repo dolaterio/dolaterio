@@ -1,5 +1,7 @@
-test:
-	go test -v github.com/dolaterio/dolaterio/core && \
+test: test-core test-api
+test-core:
+	go test -v github.com/dolaterio/dolaterio/core
+test-api:
 	go test -v github.com/dolaterio/dolaterio/api
 
 dep-install:

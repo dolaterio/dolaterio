@@ -30,8 +30,8 @@ func TestCreateAndFetchJob(t *testing.T) {
 		return
 	}
 
-	// The dummy-worker takes around 6 seconds to finish
-	time.Sleep(6100 * time.Millisecond)
+	// The dummy-worker takes a bit to finish
+	time.Sleep(1500 * time.Millisecond)
 	req, _ = http.NewRequest("GET", "/v1/tasks/"+job.ID, nil)
 
 	w = httptest.NewRecorder()
