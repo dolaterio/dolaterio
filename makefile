@@ -6,7 +6,10 @@ test-api:
 
 dep-install:
 	go get "github.com/fsouza/go-dockerclient"
+	go get "golang.org/x/crypto/bcrypt"
 	go get "github.com/gorilla/mux"
+	go get "github.com/gorilla/context"
+	go get "github.com/dgrijalva/jwt-go"
 	go get "github.com/dancannon/gorethink"
 
 build:

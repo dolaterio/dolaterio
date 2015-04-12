@@ -2,7 +2,10 @@ FROM google/golang:1.4
 
 # Getting it is very slow, adding it here to make use of caching.
 RUN go get "github.com/fsouza/go-dockerclient"
+RUN go get "golang.org/x/crypto/bcrypt"
 RUN go get "github.com/gorilla/mux"
+RUN go get "github.com/gorilla/context"
+RUN go get "github.com/dgrijalva/jwt-go"
 RUN go get "github.com/dancannon/gorethink"
 
 WORKDIR /gopath/src/github.com/dolaterio/dolaterio

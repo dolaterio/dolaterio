@@ -15,6 +15,9 @@ var (
 
 	// JobTable represents the jobs table
 	JobTable gorethink.Term
+
+	// UserTable represents the jobs table
+	UserTable gorethink.Term
 )
 
 // ConnectDb initializes the DB connection
@@ -40,6 +43,11 @@ func ConnectDb(rdbHost, rdbPort string) error {
 
 	Db.TableCreate("jobs").RunWrite(S)
 	JobTable = Db.Table("jobs")
+
+	Db.TableCreate("users", gorethink.TableCreateOpts{
+		PrimaryKey: "username",
+	}).RunWrite(S)
+	UserTable = Db.Table("users")
 
 	return nil
 }
