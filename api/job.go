@@ -4,6 +4,7 @@ package api
 type Job struct {
 	ID          string `gorethink:"id,omitempty" json:"id"`
 	DockerImage string `gorethink:"docker_image" json:"docker_image"`
+	Stdin       string `gorethink:"stdin" json:"stdin"`
 	Stdout      string `gorethink:"stdout" json:"stdout"`
 	Stderr      string `gorethink:"stderr" json:"stderr"`
 }

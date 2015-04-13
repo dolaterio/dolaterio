@@ -11,6 +11,7 @@ import (
 
 type jobObjectRequest struct {
 	DockerImage string `json:"docker_image"`
+	Stdin       string `json:"stdin"`
 }
 
 func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
@@ -20,6 +21,7 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 
 	job := &Job{
 		DockerImage: jobReq.DockerImage,
+		Stdin:       jobReq.Stdin,
 	}
 	err := CreateJob(job)
 	if err != nil {
@@ -30,6 +32,7 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 	Runner.Process(&dolaterio.JobRequest{
 		ID:    job.ID,
 		Image: job.DockerImage,
+		Stdin: []byte(job.Stdin),
 	})
 
 	renderJob(res, job)
