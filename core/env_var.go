@@ -21,3 +21,15 @@ func (envVars EnvVars) StringArray() []string {
 	}
 	return res
 }
+
+// BuildEnvVars converts a map[string]string to EnvVars
+func BuildEnvVars(vars map[string]string) EnvVars {
+	res := make(EnvVars, len(vars))
+	i := 0
+	for k, v := range vars {
+		res[i].Key = k
+		res[i].Value = v
+		i++
+	}
+	return res
+}

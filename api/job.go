@@ -2,11 +2,12 @@ package api
 
 // Job is the model struct for jobs
 type Job struct {
-	ID          string `gorethink:"id,omitempty" json:"id"`
-	DockerImage string `gorethink:"docker_image" json:"docker_image"`
-	Stdin       string `gorethink:"stdin" json:"stdin"`
-	Stdout      string `gorethink:"stdout" json:"stdout"`
-	Stderr      string `gorethink:"stderr" json:"stderr"`
+	ID          string            `gorethink:"id,omitempty" json:"id"`
+	DockerImage string            `gorethink:"docker_image" json:"docker_image"`
+	Env         map[string]string `gorethink:"env" json:"env"`
+	Stdin       string            `gorethink:"stdin" json:"stdin"`
+	Stdout      string            `gorethink:"stdout" json:"stdout"`
+	Stderr      string            `gorethink:"stderr" json:"stderr"`
 }
 
 // CreateJob inserts the job into the db

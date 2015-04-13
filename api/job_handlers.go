@@ -10,8 +10,9 @@ import (
 )
 
 type jobObjectRequest struct {
-	DockerImage string `json:"docker_image"`
-	Stdin       string `json:"stdin"`
+	DockerImage string            `json:"docker_image"`
+	Stdin       string            `json:"stdin"`
+	Env         map[string]string `json:"env"`
 }
 
 func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
@@ -22,6 +23,7 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 	job := &Job{
 		DockerImage: jobReq.DockerImage,
 		Stdin:       jobReq.Stdin,
+		Env:         jobReq.Env,
 	}
 	err := CreateJob(job)
 	if err != nil {
@@ -33,6 +35,7 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 		ID:    job.ID,
 		Image: job.DockerImage,
 		Stdin: []byte(job.Stdin),
+		Env:   dolaterio.BuildEnvVars(job.Env),
 	})
 
 	renderJob(res, job)
