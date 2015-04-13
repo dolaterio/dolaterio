@@ -9,10 +9,8 @@ import (
 )
 
 var (
-	bind    = flag.String("bind", "127.0.0.1", "Bind IP")
-	port    = flag.String("port", "8080", "API port")
-	rdbHost = flag.String("rhost", "localhost", "RethinkDB host or IP")
-	rdbPort = flag.String("rport", "28015", "RethinkDB port")
+	bind = flag.String("bind", "127.0.0.1", "Bind IP")
+	port = flag.String("port", "8080", "API port")
 )
 
 func main() {
@@ -23,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	err = api.ConnectDb(*rdbHost, *rdbPort)
+	err = api.ConnectDb()
 	if err != nil {
 		panic(err)
 	}
