@@ -1,7 +1,7 @@
 package api
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/dancannon/gorethink"
 )
@@ -18,10 +18,9 @@ var (
 )
 
 // ConnectDb initializes the DB connection
-func ConnectDb(rdbHost, rdbPort string) error {
-	rdbAddress := fmt.Sprintf("%v:%v", rdbHost, rdbPort)
+func ConnectDb() error {
 	session, err := gorethink.Connect(gorethink.ConnectOpts{
-		Address:  rdbAddress,
+		Address:  os.Getenv("RETHINKDB_ADDRESS"),
 		Database: "dolaterio",
 		MaxIdle:  10,
 		MaxOpen:  10,

@@ -11,7 +11,7 @@ import (
 
 func TestCreateAndFetchJob(t *testing.T) {
 	Initialize()
-	ConnectDb("d.lo", "28015")
+	ConnectDb()
 	handler, _ := Handler()
 
 	var job Job

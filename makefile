@@ -1,8 +1,11 @@
+RETHINKDB_ADDRESS ?= "d.lo:28015"
+
 test: test-core test-api
 test-core:
-	go test -v github.com/dolaterio/dolaterio/core
+	RETHINKDB_ADDRESS=$(RETHINKDB_ADDRESS) go test -v github.com/dolaterio/dolaterio/core
 test-api:
-	go test -v github.com/dolaterio/dolaterio/api
+	RETHINKDB_ADDRESS=$(RETHINKDB_ADDRESS) go test -v github.com/dolaterio/dolaterio/api
+
 
 dep-install:
 	go get "github.com/fsouza/go-dockerclient"
@@ -13,7 +16,7 @@ build:
 	go get github.com/dolaterio/dolaterio
 
 run: build
-	$$GOPATH/bin/dolaterio -rhost d.lo
+	$$GOPATH/bin/dolaterio
 
 3rd-party-tools:
 	docker run --restart always -d -p 8080:8080 -p 28015:28015 -p 29015:29015 --name dolaterio-rethinkdb rethinkdb:1.16
