@@ -2,7 +2,7 @@ machine:
   services:
     - docker
   environment:
-  - RETHINKDB_ADDRESS: localhost:28015
+    - RETHINKDB_ADDRESS: localhost:28015
 
 test:
   override:
