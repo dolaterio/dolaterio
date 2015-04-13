@@ -8,5 +8,6 @@ test:
 
 dependencies:
   pre:
+    - docker pull dolaterio/dummy-worker
     - docker pull busybox
     - docker pull ubuntu:14.04
