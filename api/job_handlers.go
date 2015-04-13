@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/dolaterio/dolaterio/core"
 	"github.com/gorilla/mux"
@@ -12,6 +13,7 @@ import (
 type jobObjectRequest struct {
 	DockerImage string            `json:"docker_image"`
 	Stdin       string            `json:"stdin"`
+	Timeout     int               `json:"timeout"`
 	Env         map[string]string `json:"env"`
 }
 
@@ -24,6 +26,7 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 		DockerImage: jobReq.DockerImage,
 		Stdin:       jobReq.Stdin,
 		Env:         jobReq.Env,
+		Timeout:     jobReq.Timeout,
 		Status:      "pending",
 	}
 	err := CreateJob(job)
@@ -33,10 +36,11 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	Runner.Process(&dolaterio.JobRequest{
-		ID:    job.ID,
-		Image: job.DockerImage,
-		Stdin: []byte(job.Stdin),
-		Env:   dolaterio.BuildEnvVars(job.Env),
+		ID:      job.ID,
+		Image:   job.DockerImage,
+		Stdin:   []byte(job.Stdin),
+		Timeout: time.Duration(job.Timeout) * time.Millisecond,
+		Env:     dolaterio.BuildEnvVars(job.Env),
 	})
 
 	renderJob(res, job)

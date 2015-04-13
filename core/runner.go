@@ -53,15 +53,15 @@ func (runner *Runner) Stop() {
 }
 
 // Response processes the job.
-func (runner *Runner) Response() (*JobResponse, error) {
-	return <-runner.responses, nil
+func (runner *Runner) Response() *JobResponse {
+	return <-runner.responses
 }
 
 func (runner *Runner) run() {
 	for {
 		select {
 		case req := <-runner.queue:
-			res, _ := req.Execute(runner.engine)
+			res := req.Execute(runner.engine)
 			runner.responses <- res
 		case <-runner.stop:
 			return

@@ -30,11 +30,14 @@ func Initialize() error {
 
 	go func() {
 		for {
-			job, _ := Runner.Response()
+			job := Runner.Response()
 			dbJob, _ := GetJob(job.ID)
 			dbJob.Stdout = string(job.Stdout)
 			dbJob.Stderr = string(job.Stderr)
 			dbJob.Status = "completed"
+			if job.Error != nil {
+				dbJob.Syserr = job.Error.Error()
+			}
 			UpdateJob(dbJob)
 			fmt.Println("Finished Job " + job.ID)
 		}

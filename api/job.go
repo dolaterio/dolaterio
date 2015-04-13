@@ -9,6 +9,8 @@ type Job struct {
 	Stdin       string            `gorethink:"stdin" json:"stdin"`
 	Stdout      string            `gorethink:"stdout" json:"stdout"`
 	Stderr      string            `gorethink:"stderr" json:"stderr"`
+	Timeout     int               `gorethink:"timeout,omitempty" json:"timeout"`
+	Syserr      string            `gorethink:"syserr" json:"syserr"`
 }
 
 // CreateJob inserts the job into the db

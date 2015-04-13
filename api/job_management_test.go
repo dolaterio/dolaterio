@@ -71,3 +71,12 @@ func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
 		t.Fatalf("Expected %v to contain %v", job.Stdout, "HELLO: 'world'")
 	}
 }
+
+func TestCreateAndFetchJobWithTimeout(t *testing.T) {
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"timeout\":10}")
+	job = fetchJob(t, job.ID)
+
+	if job.Syserr != "timeout" {
+		t.Fatal("Expected job to timeout")
+	}
+}

@@ -17,25 +17,30 @@ type JobResponse struct {
 	ID     string
 	Stdout []byte
 	Stderr []byte
+	Error  error
 }
 
 // Execute runs the job
-func (req *JobRequest) Execute(engine *ContainerEngine) (*JobResponse, error) {
+func (req *JobRequest) Execute(engine *ContainerEngine) *JobResponse {
+	res := &JobResponse{
+		ID: req.ID,
+	}
+
 	container, err := engine.BuildContainer(req)
 	if err != nil {
-		return nil, err
+		res.Error = err
+		return res
 	}
 	defer container.Remove()
 
-	err = container.AttachStdin()
-	if err != nil {
-		return nil, err
-	}
-
 	done := make(chan int)
 	errChn := make(chan error)
-
 	go func() {
+		err = container.AttachStdin()
+		if err != nil {
+			errChn <- err
+		}
+
 		err = container.Wait()
 		if err != nil {
 			errChn <- err
@@ -52,19 +57,21 @@ func (req *JobRequest) Execute(engine *ContainerEngine) (*JobResponse, error) {
 	select {
 	case <-done:
 	case err := <-errChn:
-		return nil, err
+		res.Error = err
+		return res
+
 	case <-time.After(timeout):
-		return nil, errTimeout
+		res.Error = errTimeout
+		return res
 	}
 
 	err = container.FetchOutput()
 	if err != nil {
-		return nil, err
+		res.Error = err
+		return res
 	}
 
-	return &JobResponse{
-		ID:     req.ID,
-		Stdout: container.Stdout(),
-		Stderr: container.Stderr(),
-	}, nil
+	res.Stdout = container.Stdout()
+	res.Stderr = container.Stderr()
+	return res
 }
