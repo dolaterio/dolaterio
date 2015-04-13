@@ -11,9 +11,9 @@ func Handler() (http.Handler, error) {
 	r := mux.NewRouter()
 	v1 := r.PathPrefix("/v1").Subrouter()
 
-	tasks := v1.PathPrefix("/tasks").Subrouter()
-	tasks.Methods("POST").HandlerFunc(tasksCreateHandler)
-	tasks.Methods("GET").Path("/{id}").HandlerFunc(tasksIndexHandler)
+	jobs := v1.PathPrefix("/jobs").Subrouter()
+	jobs.Methods("POST").HandlerFunc(jobsCreateHandler)
+	jobs.Methods("GET").Path("/{id}").HandlerFunc(jobsIndexHandler)
 
 	handler := Authenticate(r)
 	return handler, nil

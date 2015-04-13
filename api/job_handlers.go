@@ -13,7 +13,7 @@ type jobObjectRequest struct {
 	DockerImage string `json:"docker_image"`
 }
 
-func tasksCreateHandler(res http.ResponseWriter, req *http.Request) {
+func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	var jobReq jobObjectRequest
 	decoder.Decode(&jobReq)
@@ -35,7 +35,7 @@ func tasksCreateHandler(res http.ResponseWriter, req *http.Request) {
 	renderJob(res, job)
 }
 
-func tasksIndexHandler(res http.ResponseWriter, req *http.Request) {
+func jobsIndexHandler(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	job, err := GetJob(vars["id"])
 

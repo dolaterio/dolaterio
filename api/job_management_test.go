@@ -16,7 +16,7 @@ func TestCreateAndFetchJob(t *testing.T) {
 
 	var job Job
 
-	req, _ := http.NewRequest("POST", "/v1/tasks",
+	req, _ := http.NewRequest("POST", "/v1/jobs",
 		bytes.NewBufferString("{\"docker_image\":\"dolaterio/dummy-worker\"}"))
 
 	w := httptest.NewRecorder()
@@ -32,7 +32,7 @@ func TestCreateAndFetchJob(t *testing.T) {
 
 	// The dummy-worker takes a bit to finish
 	time.Sleep(1500 * time.Millisecond)
-	req, _ = http.NewRequest("GET", "/v1/tasks/"+job.ID, nil)
+	req, _ = http.NewRequest("GET", "/v1/jobs/"+job.ID, nil)
 
 	w = httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
