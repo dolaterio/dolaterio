@@ -2,16 +2,45 @@
 
 [![Circle CI](https://circleci.com/gh/dolaterio/dolaterio.svg?style=svg)](https://circleci.com/gh/dolaterio/dolaterio)
 
-Dolater.io is a project to execute background jobs in a very scalable way.
+Dolater.io lets you execute background jobs on a remote docker server.
 
-# Architecture
+# Quick start
 
-Jobs are mostly docker images. Every job to run it's a docker container. The job specifies the docker image to run to process the job. A very simple docker image used for testing can be found here: [dolaterio/dummy_worker](https://github.com/dolaterio/dummy_worker)
+Dolater.io runs your jobs as docker images. Check out our example docker images like [dolaterio/dummy_worker](https://github.com/dolaterio/dummy_worker), [dolaterio/asciify](https://github.com/dolaterio/asciify) or [dolaterio/parrot](https://github.com/dolaterio/parrot).
 
-At the end of the stack of _dolater.io_ there's a job runner. Each runner runs up to N jobs simultaneously. The runner runs the container, waits for it to finish and gets its results.
+Run rethinkdb, it's a dependency for dolater.io:
+```
+docker run \
+  --restart always \
+  -d \
+  -p 8080:8080 \
+  -p 28015:28015 \
+  -p 29015:29015 \
+  --name dolaterio-rethinkdb \
+  rethinkdb:1.16
+```
 
-In the stack, right before the job runner there's queue with the jobs pending to execute. Multiple runners can be consuming the queue. The queue system will make sure that only one runner gets one specific job.
+Then, run dolater.io:
 
-Once the runner finishes processing a queue message, it'll write the results to a different queue.
+```
+docker run \
+  -d \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -p 8080:8080 \
+  --link dolaterio-rethinkdb:rethinkdb \
+  dolaterio \
+  bash -c "\
+    RETHINKDB_ADDRESS="\$RETHINKDB_PORT_28015_TCP_ADDR:\$RETHINKDB_PORT_28015_TCP_PORT" /gopath/bin/dolaterio --bind 0.0.0.0\
+  "
+```
 
-At this point the job runners are running behind queues. Multiple processes can queue jobs and multiple process can consume job results.
+Now, ready to queue a job! Send the following request to your instance:
+```
+curl http://DOCKERHOST:8080/v1/jobs -H "Content-Type: application/json" -X POST -d '{"docker_image": "dolaterio/parrot", "stdin": "Hello world!"}'
+```
+
+It will return a new JSON containing an `id`. You can request dolater.io for the current state of the job:
+
+```
+curl http://DOCKERHOST:8080/v1/jobs/ID
+```
