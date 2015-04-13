@@ -28,7 +28,7 @@ docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -p 8080:8080 \
   --link dolaterio-rethinkdb:rethinkdb \
-  dolaterio \
+  dolaterio/dolaterio \
   bash -c "\
     RETHINKDB_ADDRESS="\$RETHINKDB_PORT_28015_TCP_ADDR:\$RETHINKDB_PORT_28015_TCP_PORT" /gopath/bin/dolaterio --bind 0.0.0.0\
   "
