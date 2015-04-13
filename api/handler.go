@@ -15,6 +15,5 @@ func Handler() (http.Handler, error) {
 	jobs.Methods("POST").HandlerFunc(jobsCreateHandler)
 	jobs.Methods("GET").Path("/{id}").HandlerFunc(jobsIndexHandler)
 
-	handler := Authenticate(r)
-	return handler, nil
+	return r, nil
 }
