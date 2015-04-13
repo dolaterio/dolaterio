@@ -24,6 +24,7 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 		DockerImage: jobReq.DockerImage,
 		Stdin:       jobReq.Stdin,
 		Env:         jobReq.Env,
+		Status:      "pending",
 	}
 	err := CreateJob(job)
 	if err != nil {

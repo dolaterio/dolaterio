@@ -3,6 +3,7 @@ package api
 // Job is the model struct for jobs
 type Job struct {
 	ID          string            `gorethink:"id,omitempty" json:"id"`
+	Status      string            `gorethink:"status" json:"status"`
 	DockerImage string            `gorethink:"docker_image" json:"docker_image"`
 	Env         map[string]string `gorethink:"env" json:"env"`
 	Stdin       string            `gorethink:"stdin" json:"stdin"`

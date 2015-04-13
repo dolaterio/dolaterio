@@ -10,110 +10,64 @@ import (
 	"time"
 )
 
-func TestCreateAndFetchJob(t *testing.T) {
-	Initialize()
-	ConnectDb()
-	handler, _ := Handler()
+func createJob(t *testing.T, body string) *Job {
 
-	var job Job
-
-	req, _ := http.NewRequest("POST", "/v1/jobs",
-		bytes.NewBufferString("{\"docker_image\":\"dolaterio/dummy-worker\"}"))
+	req, _ := http.NewRequest("POST", "/v1/jobs", bytes.NewBufferString(body))
 
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 
 	decoder := json.NewDecoder(w.Body)
+	var job Job
 	decoder.Decode(&job)
+	return &job
+}
 
-	if job.ID == "" {
-		t.Error("The new job didn't get an ID")
-		return
+func fetchJobTimeout(t *testing.T, id string, attempts int) *Job {
+	if attempts <= 0 {
+		t.Fatal("The job has not completed")
 	}
+	req, _ := http.NewRequest("GET", "/v1/jobs/"+id, nil)
 
-	// The dummy-worker takes a bit to finish
-	time.Sleep(3000 * time.Millisecond)
-	req, _ = http.NewRequest("GET", "/v1/jobs/"+job.ID, nil)
-
-	w = httptest.NewRecorder()
+	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
-	decoder = json.NewDecoder(w.Body)
-	decoder.Decode(&job)
 
+	decoder := json.NewDecoder(w.Body)
+	var job Job
+	decoder.Decode(&job)
+	if job.Status != "completed" {
+		time.Sleep(100 * time.Millisecond)
+		return fetchJobTimeout(t, id, attempts-1)
+	}
+	return &job
+}
+
+func fetchJob(t *testing.T, id string) *Job {
+	return fetchJobTimeout(t, id, 50)
+}
+
+func TestCreateAndFetchJob(t *testing.T) {
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\"}")
+	job = fetchJob(t, job.ID)
 	if len(job.Stdout) == 0 {
-		t.Error("The job has no output")
-		return
+		t.Fatal("The job has no output")
 	}
 }
 
 func TestCreateAndFetchJobWithStdin(t *testing.T) {
-	Initialize()
-	ConnectDb()
-	handler, _ := Handler()
-
-	var job Job
-
-	req, _ := http.NewRequest("POST", "/v1/jobs",
-		bytes.NewBufferString("{\"docker_image\":\"dolaterio/dummy-worker\",\"stdin\":\"hello world\"}"))
-
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
-
-	decoder := json.NewDecoder(w.Body)
-	decoder.Decode(&job)
-
-	if job.ID == "" {
-		t.Error("The new job didn't get an ID")
-		return
-	}
-
-	// The dummy-worker takes a bit to finish
-	time.Sleep(3000 * time.Millisecond)
-	req, _ = http.NewRequest("GET", "/v1/jobs/"+job.ID, nil)
-
-	w = httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
-	decoder = json.NewDecoder(w.Body)
-	decoder.Decode(&job)
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"stdin\":\"hello world\"}")
+	job = fetchJob(t, job.ID)
 
 	if !strings.Contains(job.Stdout, "hello world") {
-		t.Errorf("Expected %v to contain %v", job.Stdout, "hello world")
-		return
+		t.Fatalf("Expected %v to contain %v", job.Stdout, "hello world")
 	}
 }
 
 func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
-	Initialize()
-	ConnectDb()
-	handler, _ := Handler()
-
-	var job Job
-
-	req, _ := http.NewRequest("POST", "/v1/jobs",
-		bytes.NewBufferString("{\"docker_image\":\"dolaterio/dummy-worker\",\"env\":{\"HELLO\":\"world\"}}"))
-
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
-
-	decoder := json.NewDecoder(w.Body)
-	decoder.Decode(&job)
-
-	if job.ID == "" {
-		t.Error("The new job didn't get an ID")
-		return
-	}
-
-	// The dummy-worker takes a bit to finish
-	time.Sleep(3000 * time.Millisecond)
-	req, _ = http.NewRequest("GET", "/v1/jobs/"+job.ID, nil)
-
-	w = httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
-	decoder = json.NewDecoder(w.Body)
-	decoder.Decode(&job)
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"env\":{\"HELLO\":\"world\"}}")
+	job = fetchJob(t, job.ID)
 
 	if !strings.Contains(job.Stdout, "HELLO: 'world'") {
-		t.Errorf("Expected %v to contain %v", job.Stdout, "HELLO: 'world'")
-		return
+		t.Fatalf("Expected %v to contain %v", job.Stdout, "HELLO: 'world'")
 	}
 }
