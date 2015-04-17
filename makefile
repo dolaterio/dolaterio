@@ -1,10 +1,8 @@
-RETHINKDB_ADDRESS ?= "d.lo:28015"
-
 test: test-core test-api
 test-core:
-	RETHINKDB_ADDRESS=$(RETHINKDB_ADDRESS) go test -v github.com/dolaterio/dolaterio/core
+	go test -v github.com/dolaterio/dolaterio/core
 test-api:
-	RETHINKDB_ADDRESS=$(RETHINKDB_ADDRESS) go test -v github.com/dolaterio/dolaterio/api
+	go test -v github.com/dolaterio/dolaterio/api
 
 dep-install:
 	go get -u "github.com/fsouza/go-dockerclient"
