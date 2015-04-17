@@ -29,8 +29,7 @@ func Initialize() error {
 	Runner = runner
 
 	go func() {
-		for {
-			job := Runner.Response()
+		for job := range Runner.Responses {
 			dbJob, _ := GetJob(job.ID)
 			dbJob.Stdout = string(job.Stdout)
 			dbJob.Stderr = string(job.Stderr)

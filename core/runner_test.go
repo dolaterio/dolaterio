@@ -16,7 +16,7 @@ func TestSimpleProcess(t *testing.T) {
 		Cmd:   []string{"echo", "hello world"},
 	})
 	assertNil(t, err)
-	res := runner.Response()
+	res := <-runner.Responses
 	assertNil(t, res.Error)
 	assertString(t, "hello world\n", string(res.Stdout))
 	runner.Stop()
@@ -37,7 +37,7 @@ func TestParallelProcess(t *testing.T) {
 		assertNil(t, err)
 	}
 	for i := 0; i < 5; i++ {
-		res := runner.Response()
+		res := <-runner.Responses
 		assertNil(t, res.Error)
 	}
 	assertMaxDuration(t, 4*time.Second, time.Since(begin))

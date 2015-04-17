@@ -4,11 +4,12 @@ import "errors"
 
 // Runner models a job runner
 type Runner struct {
-	engine    *ContainerEngine
-	queue     chan *JobRequest
-	responses chan *JobResponse
-	stop      chan bool
-	stopped   bool
+	Responses chan *JobResponse
+
+	engine  *ContainerEngine
+	queue   chan *JobRequest
+	stop    chan bool
+	stopped bool
 }
 
 // RunnerOptions models the data required to initialize a Runner
@@ -26,7 +27,7 @@ func NewRunner(options *RunnerOptions) (*Runner, error) {
 	runner := &Runner{
 		engine:    options.Engine,
 		queue:     make(chan *JobRequest, options.Concurrency),
-		responses: make(chan *JobResponse, options.Concurrency),
+		Responses: make(chan *JobResponse, options.Concurrency),
 		stop:      make(chan bool, options.Concurrency),
 	}
 	for i := 0; i < options.Concurrency; i++ {
@@ -52,17 +53,12 @@ func (runner *Runner) Stop() {
 	}
 }
 
-// Response processes the job.
-func (runner *Runner) Response() *JobResponse {
-	return <-runner.responses
-}
-
 func (runner *Runner) run() {
 	for {
 		select {
 		case req := <-runner.queue:
 			res := req.Execute(runner.engine)
-			runner.responses <- res
+			runner.Responses <- res
 		case <-runner.stop:
 			return
 		}
