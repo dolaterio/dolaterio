@@ -8,6 +8,9 @@ var (
 
 func init() {
 	Initialize()
-	ConnectDb()
+	err := ConnectDb()
+	if err != nil {
+		panic(err)
+	}
 	handler, _ = Handler()
 }
