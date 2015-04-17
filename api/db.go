@@ -27,6 +27,8 @@ func ConnectDb() error {
 	if address == "" {
 		return INVALID_DB_ADDRESS
 	}
+
+	// Open a session to the DB
 	session, err := gorethink.Connect(gorethink.ConnectOpts{
 		Address:  os.Getenv("RETHINKDB_ADDRESS"),
 		Database: "dolaterio",
@@ -42,11 +44,49 @@ func ConnectDb() error {
 
 	S = session
 
-	gorethink.DbCreate("dolaterio").RunWrite(S)
+	// Get the db (and create if missing)
+	q, err := gorethink.DbList().Run(S)
+	if err != nil {
+		return err
+	}
+
+	var databases []string
+	q.All(&databases)
+
+	if !arrContainsString(databases, "dolaterio") {
+		_, err = gorethink.DbCreate("dolaterio").RunWrite(S)
+		if err != nil {
+			return err
+		}
+
+	}
+
 	Db = gorethink.Db("dolaterio")
 
-	Db.TableCreate("jobs").RunWrite(S)
+	// Get tables (and create if missing)
+	q, err = Db.TableList().Run(S)
+	if err != nil {
+		return err
+	}
+	var tables []string
+	q.All(&tables)
+
+	if !arrContainsString(tables, "jobs") {
+		_, err = Db.TableCreate("jobs").RunWrite(S)
+		if err != nil {
+			return err
+		}
+	}
 	JobTable = Db.Table("jobs")
 
 	return nil
+}
+
+func arrContainsString(arr []string, val string) bool {
+	for _, it := range arr {
+		if it == val {
+			return true
+		}
+	}
+	return false
 }
