@@ -7,10 +7,10 @@ var (
 )
 
 func init() {
-	Initialize()
 	err := ConnectDb()
 	if err != nil {
 		panic(err)
 	}
+	Initialize()
 	handler, _ = Handler()
 }
