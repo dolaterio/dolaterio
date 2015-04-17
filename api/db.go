@@ -17,7 +17,7 @@ var (
 	// JobTable represents the jobs table
 	JobTable gorethink.Term
 
-	INVALID_DB_ADDRESS = errors.New(
+	errInvalidDbAddress = errors.New(
 		"Invalid RethinkDB address. Please make sure $RETHINKDB_ADDRESS is properly set.")
 )
 
@@ -25,7 +25,7 @@ var (
 func ConnectDb() error {
 	address := os.Getenv("RETHINKDB_ADDRESS")
 	if address == "" {
-		return INVALID_DB_ADDRESS
+		return errInvalidDbAddress
 	}
 
 	// Open a session to the DB
