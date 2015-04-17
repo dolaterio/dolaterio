@@ -6,11 +6,10 @@ test-core:
 test-api:
 	RETHINKDB_ADDRESS=$(RETHINKDB_ADDRESS) go test -v github.com/dolaterio/dolaterio/api
 
-
 dep-install:
-	go get "github.com/fsouza/go-dockerclient"
-	go get "github.com/gorilla/mux"
-	go get "github.com/dancannon/gorethink"
+	go get -u "github.com/fsouza/go-dockerclient"
+	go get -u "github.com/gorilla/mux"
+	go get -u "github.com/dancannon/gorethink"
 
 build:
 	go get github.com/dolaterio/dolaterio
@@ -19,7 +18,7 @@ run: build
 	$$GOPATH/bin/dolaterio
 
 3rd-party-tools:
-	docker run --restart always -d -p 8080:8080 -p 28015:28015 -p 29015:29015 --name dolaterio-rethinkdb rethinkdb:1.16
+	docker run --restart always -d -p 8080:8080 -p 28015:28015 -p 29015:29015 --name dolaterio-rethinkdb rethinkdb:2.0
 
 build-dist:
 	docker build -t dolaterio .
