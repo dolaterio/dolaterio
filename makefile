@@ -1,13 +1,11 @@
 test: test-core test-api
 test-core:
-	go test -v github.com/dolaterio/dolaterio/core
+	godep go test -v github.com/dolaterio/dolaterio/core
 test-api:
-	go test -v github.com/dolaterio/dolaterio/api
+	godep go test -v github.com/dolaterio/dolaterio/api
 
 dep-install:
-	go get -u "github.com/fsouza/go-dockerclient"
-	go get -u "github.com/gorilla/mux"
-	go get -u "github.com/dancannon/gorethink"
+	go get github.com/tools/godep && godep restore
 
 build:
 	go get github.com/dolaterio/dolaterio

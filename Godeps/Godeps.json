@@ -1,0 +1,74 @@
+{
+	"ImportPath": "github.com/dolaterio/dolaterio",
+	"GoVersion": "go1.4",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.7.3",
+			"Rev": "55eb11d21d2a31a3cc93838241d04800f52e823d"
+		},
+		{
+			"ImportPath": "github.com/cenkalti/backoff",
+			"Rev": "9831e1e25c874e0a0601b6dc43641071414eec7a"
+		},
+		{
+			"ImportPath": "github.com/dancannon/gorethink",
+			"Comment": "v0.7.1",
+			"Rev": "0fcd578dc17224eb4812abb34a472f6b72d9c62f"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/archive",
+			"Comment": "v1.4.1-2827-g17d5450",
+			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/fileutils",
+			"Comment": "v1.4.1-2827-g17d5450",
+			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/ioutils",
+			"Comment": "v1.4.1-2827-g17d5450",
+			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/pools",
+			"Comment": "v1.4.1-2827-g17d5450",
+			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/promise",
+			"Comment": "v1.4.1-2827-g17d5450",
+			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/pkg/system",
+			"Comment": "v1.4.1-2827-g17d5450",
+			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+		},
+		{
+			"ImportPath": "github.com/docker/docker/vendor/src/code.google.com/p/go/src/pkg/archive/tar",
+			"Comment": "v1.4.1-2827-g17d5450",
+			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+		},
+		{
+			"ImportPath": "github.com/fsouza/go-dockerclient",
+			"Rev": "4a43f0ee9fe0c8f6cb7672b41b11122b40bb531a"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "655cdfa588ea190e901bc5590e65d5621688847c"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "8096f47503459bcc74d1f4c487b7e6e42e5746b5"
+		}
+	]
+}
