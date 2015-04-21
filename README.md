@@ -17,7 +17,7 @@ docker run \
   -p 28015:28015 \
   -p 29015:29015 \
   --name dolaterio-rethinkdb \
-  rethinkdb:1.16
+  rethinkdb:2.0
 ```
 
 Then, run dolater.io:
