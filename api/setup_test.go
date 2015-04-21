@@ -11,6 +11,9 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	Initialize()
-	handler, _ = Handler()
+	err = Initialize()
+	if err != nil {
+		panic(err)
+	}
+	handler = Handler()
 }

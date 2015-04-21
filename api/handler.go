@@ -7,7 +7,7 @@ import (
 )
 
 // Handler returns the http handler to serve the dolater.io API
-func Handler() (http.Handler, error) {
+func Handler() http.Handler {
 	r := mux.NewRouter()
 	v1 := r.PathPrefix("/v1").Subrouter()
 
@@ -15,5 +15,5 @@ func Handler() (http.Handler, error) {
 	jobs.Methods("POST").HandlerFunc(jobsCreateHandler)
 	jobs.Methods("GET").Path("/{id}").HandlerFunc(jobsIndexHandler)
 
-	return r, nil
+	return r
 }
