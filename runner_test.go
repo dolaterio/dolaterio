@@ -8,50 +8,52 @@ import (
 func TestSimpleProcess(t *testing.T) {
 	runner, err := NewRunner(&RunnerOptions{
 		Engine:      testContainerEngine,
-		Concurrency: 10,
+		Concurrency: 1,
 	})
 	assertNil(t, err)
-	err = runner.Process(&JobRequest{
+	job := &Job{
 		Image: "ubuntu:14.04",
 		Cmd:   []string{"echo", "hello world"},
-	})
+	}
+	err = runner.Process(job)
 	assertNil(t, err)
-	res := <-runner.Responses
-	assertNil(t, res.Error)
-	assertString(t, "hello world\n", string(res.Stdout))
-	runner.Stop()
+	runner.Stop() // Waits for all tasks to finish
+	assertNil(t, job.Error)
+	assertString(t, "hello world\n", string(job.Stdout))
 }
 
 func TestParallelProcess(t *testing.T) {
 	begin := time.Now()
 	runner, err := NewRunner(&RunnerOptions{
 		Engine:      testContainerEngine,
-		Concurrency: 10,
+		Concurrency: 5,
 	})
 	assertNil(t, err)
+	jobs := make([]*Job, 5)
 	for i := 0; i < 5; i++ {
-		err = runner.Process(&JobRequest{
+		jobs[i] = &Job{
 			Image: "ubuntu:14.04",
 			Cmd:   []string{"sleep", "1"},
-		})
+		}
+		err = runner.Process(jobs[i])
 		assertNil(t, err)
 	}
+	runner.Stop() // Waits for all tasks to finish
+
 	for i := 0; i < 5; i++ {
-		res := <-runner.Responses
-		assertNil(t, res.Error)
+		assertNil(t, jobs[i].Error)
 	}
 	assertMaxDuration(t, 4*time.Second, time.Since(begin))
-	runner.Stop()
 }
 
-func TestStopWhileWaiting(t *testing.T) {
+func TestFailsProcessingAfterStop(t *testing.T) {
 	runner, err := NewRunner(&RunnerOptions{
 		Engine:      testContainerEngine,
-		Concurrency: 10,
+		Concurrency: 1,
 	})
 	assertNil(t, err)
 	runner.Stop()
-	err = runner.Process(&JobRequest{
+	err = runner.Process(&Job{
 		Image: "ubuntu:14.04",
 		Cmd:   []string{"sleep", "1"},
 	})

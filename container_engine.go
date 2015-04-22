@@ -56,23 +56,23 @@ func (engine *ContainerEngine) Timeout() time.Duration {
 }
 
 // BuildContainer builds a Container to process the current request
-func (engine *ContainerEngine) BuildContainer(req *JobRequest) (*Container, error) {
+func (engine *ContainerEngine) BuildContainer(job *Job) (*Container, error) {
 	var err error
 	// err = engine.client.PullImage(docker.PullImageOptions{
-	// 	Repository: req.Image,
+	// 	Repository: job.Image,
 	// }, docker.AuthConfiguration{})
 	// if err != nil {
 	// 	return nil, err
 	// }
 	c, err := engine.client.CreateContainer(docker.CreateContainerOptions{
 		Config: &docker.Config{
-			Image:      req.Image,
-			Env:        req.Env.StringArray(),
+			Image:      job.Image,
+			Env:        job.Env.StringArray(),
 			Memory:     128 * 1024 * 1024, // 128 MB
 			MemorySwap: 0,
 			StdinOnce:  true,
 			OpenStdin:  true,
-			Cmd:        req.Cmd,
+			Cmd:        job.Cmd,
 		},
 	})
 	if err != nil {
@@ -87,7 +87,7 @@ func (engine *ContainerEngine) BuildContainer(req *JobRequest) (*Container, erro
 	res := &Container{
 		engine:      engine,
 		containerID: c.ID,
-		stdin:       req.Stdin,
+		stdin:       job.Stdin,
 	}
 
 	return res, nil
