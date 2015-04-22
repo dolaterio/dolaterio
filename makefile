@@ -5,7 +5,7 @@ test-api:
 	godep go test -v github.com/dolaterio/dolaterio/api
 
 dep-install:
-	go get github.com/tools/godep && godep restore
+	go get github.com/tools/godep && GOPATH=$$(godep path) godep restore
 
 build:
 	go get github.com/dolaterio/dolaterio
