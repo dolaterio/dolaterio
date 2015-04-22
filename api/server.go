@@ -1,9 +1,9 @@
-package api
+package main
 
 import (
 	"fmt"
 
-	"github.com/dolaterio/dolaterio/core"
+	"github.com/dolaterio/dolaterio"
 )
 
 var (

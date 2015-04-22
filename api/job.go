@@ -1,4 +1,4 @@
-package api
+package main
 
 // Job is the model struct for jobs
 type Job struct {

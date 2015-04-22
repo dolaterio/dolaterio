@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/dolaterio/dolaterio/api"
 )
 
 var (
@@ -17,17 +15,17 @@ var (
 func main() {
 	flag.Parse()
 
-	err := api.Initialize()
+	err := Initialize()
 	if err != nil {
 		log.Fatal("Failure to connect to container engine and job runner: ", err)
 	}
 
-	err = api.ConnectDb()
+	err = ConnectDb()
 	if err != nil {
 		log.Fatal("Failure to connect to db: ", err)
 	}
 
-	http.Handle("/", api.Handler())
+	http.Handle("/", Handler())
 	address := fmt.Sprintf("%v:%v", *bind, *port)
 
 	fmt.Printf("Serving dolater.io api on %v\n", address)

@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dolaterio/dolaterio/core"
+	"github.com/dolaterio/dolaterio"
 	"github.com/gorilla/mux"
 )
 
