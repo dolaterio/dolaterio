@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/dolaterio/dolaterio/db"
 )
 
 var (
@@ -15,12 +17,7 @@ var (
 func main() {
 	flag.Parse()
 
-	err := Initialize()
-	if err != nil {
-		log.Fatal("Failure to connect to container engine and job runner: ", err)
-	}
-
-	err = ConnectDb()
+	err := db.Connect()
 	if err != nil {
 		log.Fatal("Failure to connect to db: ", err)
 	}

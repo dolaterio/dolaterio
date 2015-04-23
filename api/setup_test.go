@@ -7,13 +7,5 @@ var (
 )
 
 func init() {
-	err := ConnectDb()
-	if err != nil {
-		panic(err)
-	}
-	err = Initialize()
-	if err != nil {
-		panic(err)
-	}
 	handler = Handler()
 }

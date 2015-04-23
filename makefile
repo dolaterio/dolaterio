@@ -1,6 +1,5 @@
 test:
-	godep go test -v github.com/dolaterio/dolaterio/runner
-	godep go test -v github.com/dolaterio/dolaterio/db
+	godep go test -race -v github.com/dolaterio/dolaterio/...
 
 dep-install:
 	go get github.com/tools/godep && GOPATH=$$(godep path) godep restore

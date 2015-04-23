@@ -4,16 +4,16 @@ import "time"
 
 // Job is the model struct for jobs
 type Job struct {
-	ID          string            `gorethink:"id,omitempty"`
-	Status      string            `gorethink:"status"`
-	DockerImage string            `gorethink:"docker_image"`
-	Cmd         []string          `gorethink:"cmd"`
-	Env         map[string]string `gorethink:"env"`
-	Stdin       string            `gorethink:"stdin"`
-	Stdout      string            `gorethink:"stdout"`
-	Stderr      string            `gorethink:"stderr"`
-	Timeout     time.Duration     `gorethink:"timeout,omitempty"`
-	Syserr      string            `gorethink:"syserr"`
+	ID          string            `gorethink:"id,omitempty" json:"id"`
+	Status      string            `gorethink:"status" json:"status"`
+	DockerImage string            `gorethink:"docker_image" json:"docker_image"`
+	Cmd         []string          `gorethink:"cmd" json:"cmd"`
+	Env         map[string]string `gorethink:"env" json:"env"`
+	Stdin       string            `gorethink:"stdin" json:"stdin"`
+	Stdout      string            `gorethink:"stdout" json:"stdout"`
+	Stderr      string            `gorethink:"stderr" json:"stderr"`
+	Timeout     time.Duration     `gorethink:"timeout,omitempty" json:"timeout"`
+	Syserr      string            `gorethink:"syserr" json:"syserr"`
 }
 
 // Store inserts the job into the db
