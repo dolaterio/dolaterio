@@ -1,34 +1,30 @@
-package dolaterio
+package docker
 
 import (
 	"bytes"
-	"errors"
 	"os"
 	"time"
 
+	"github.com/dolaterio/dolaterio/db"
 	"github.com/fsouza/go-dockerclient"
 )
 
-// ContainerEngine is the engine to process jobs on docker
-type ContainerEngine struct {
+// Engine is the engine to process jobs on docker
+type Engine struct {
 	client *docker.Client
 }
 
 // Container is a data struct representing the container status
 type Container struct {
-	engine      *ContainerEngine
+	engine      *Engine
 	containerID string
 	stdin       []byte
 	stdout      []byte
 	stderr      []byte
 }
 
-var (
-	errTimeout = errors.New("timeout")
-)
-
 // Connect connects to the docker host and sets the client
-func (engine *ContainerEngine) Connect() error {
+func (engine *Engine) Connect() error {
 	var c *docker.Client
 	var err error
 
@@ -51,23 +47,30 @@ func (engine *ContainerEngine) Connect() error {
 }
 
 // Timeout returns the default timeout
-func (engine *ContainerEngine) Timeout() time.Duration {
+func (engine *Engine) Timeout() time.Duration {
 	return 30 * time.Second
 }
 
 // BuildContainer builds a Container to process the current request
-func (engine *ContainerEngine) BuildContainer(job *Job) (*Container, error) {
+func (engine *Engine) BuildContainer(job *db.Job) (*Container, error) {
 	var err error
 	// err = engine.client.PullImage(docker.PullImageOptions{
-	// 	Repository: job.Image,
+	//  Repository: job.Image,
 	// }, docker.AuthConfiguration{})
 	// if err != nil {
-	// 	return nil, err
+	//  return nil, err
 	// }
+
+	envVars := make([]string, len(job.Env))
+	idx := 0
+	for k, v := range job.Env {
+		envVars[idx] = k + "=" + v
+		idx++
+	}
 	c, err := engine.client.CreateContainer(docker.CreateContainerOptions{
 		Config: &docker.Config{
-			Image:      job.Image,
-			Env:        job.Env.StringArray(),
+			Image:      job.DockerImage,
+			Env:        envVars,
 			Memory:     128 * 1024 * 1024, // 128 MB
 			MemorySwap: 0,
 			StdinOnce:  true,
@@ -87,7 +90,7 @@ func (engine *ContainerEngine) BuildContainer(job *Job) (*Container, error) {
 	res := &Container{
 		engine:      engine,
 		containerID: c.ID,
-		stdin:       job.Stdin,
+		stdin:       []byte(job.Stdin),
 	}
 
 	return res, nil

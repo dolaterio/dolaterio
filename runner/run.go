@@ -1,13 +1,22 @@
-package dolaterio
+package runner
 
-import "time"
+import (
+	"errors"
+	"time"
+
+	"github.com/dolaterio/dolaterio/db"
+	"github.com/dolaterio/dolaterio/docker"
+)
+
+var (
+	errTimeout = errors.New("timeout")
+)
 
 // Run runs the job against in the container engine
-func (job *Job) Run(engine *ContainerEngine) {
+func Run(job *db.Job, engine *docker.Engine) error {
 	container, err := engine.BuildContainer(job)
 	if err != nil {
-		job.Error = err
-		return
+		return err
 	}
 	defer container.Remove()
 
@@ -35,19 +44,18 @@ func (job *Job) Run(engine *ContainerEngine) {
 	select {
 	case <-done:
 	case err := <-errChn:
-		job.Error = err
-		return
+		return err
 
 	case <-time.After(timeout):
-		job.Error = errTimeout
-		return
+		return errTimeout
 	}
 
 	err = container.FetchOutput()
 	if err != nil {
-		job.Error = err
+		return err
 	}
 
-	job.Stdout = container.Stdout()
-	job.Stderr = container.Stderr()
+	job.Stdout = string(container.Stdout())
+	job.Stderr = string(container.Stderr())
+	return nil
 }
