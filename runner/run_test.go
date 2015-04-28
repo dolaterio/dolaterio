@@ -14,8 +14,7 @@ func TestEcho(t *testing.T) {
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"echo", "hello world"},
 	}
-	engine := &docker.Engine{}
-	err := engine.Connect()
+	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
 	err = Run(job, engine)
@@ -30,8 +29,7 @@ func TestEnv(t *testing.T) {
 		Cmd:         []string{"env"},
 		Env:         map[string]string{"K1": "V1", "K2": "V2"},
 	}
-	engine := &docker.Engine{}
-	err := engine.Connect()
+	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
 	err = Run(job, engine)
@@ -46,8 +44,7 @@ func TestStdin(t *testing.T) {
 		Cmd:         []string{"cat"},
 		Stdin:       "hello world\n",
 	}
-	engine := &docker.Engine{}
-	err := engine.Connect()
+	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
 	err = Run(job, engine)
@@ -60,8 +57,7 @@ func TestStderr(t *testing.T) {
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"bash", "-c", "echo hello world >&2"},
 	}
-	engine := &docker.Engine{}
-	err := engine.Connect()
+	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
 	err = Run(job, engine)
@@ -75,8 +71,7 @@ func TestTimeout(t *testing.T) {
 		Cmd:         []string{"sleep", "2000"},
 		Timeout:     1 * time.Millisecond,
 	}
-	engine := &docker.Engine{}
-	err := engine.Connect()
+	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
 	err = Run(job, engine)

@@ -38,7 +38,7 @@ func Run(job *db.Job, engine *docker.Engine) error {
 
 	timeout := job.Timeout
 	if timeout == 0 {
-		timeout = engine.Timeout()
+		timeout = engine.Timeout
 	}
 
 	select {
@@ -55,7 +55,7 @@ func Run(job *db.Job, engine *docker.Engine) error {
 		return err
 	}
 
-	job.Stdout = string(container.Stdout())
-	job.Stderr = string(container.Stderr())
+	job.Stdout = string(container.StdOut)
+	job.Stderr = string(container.StdErr)
 	return nil
 }

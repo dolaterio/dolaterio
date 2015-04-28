@@ -1,26 +1,23 @@
 package runner
 
-// import (
-// 	"testing"
-// 	"time"
-// )
+import "testing"
 
-// func TestSimpleProcess(t *testing.T) {
-// 	runner, err := NewRunner(&RunnerOptions{
-// 		Engine:      testContainerEngine,
-// 		Concurrency: 1,
-// 	})
-// 	assertNil(t, err)
-// 	job := &Job{
-// 		Image: "ubuntu:14.04",
-// 		Cmd:   []string{"echo", "hello world"},
-// 	}
-// 	err = runner.Process(job)
-// 	assertNil(t, err)
-// 	runner.Stop() // Waits for all tasks to finish
-// 	assertNil(t, job.Error)
-// 	assertString(t, "hello world\n", string(job.Stdout))
-// }
+func TestSimpleProcess(t *testing.T) {
+	runner, err := NewRunner(&RunnerOptions{
+		Engine:      testContainerEngine,
+		Concurrency: 1,
+	})
+	assertNil(t, err)
+	job := &Job{
+		Image: "ubuntu:14.04",
+		Cmd:   []string{"echo", "hello world"},
+	}
+	err = runner.Process(job)
+	assertNil(t, err)
+	runner.Stop() // Waits for all tasks to finish
+	assertNil(t, job.Error)
+	assertString(t, "hello world\n", string(job.Stdout))
+}
 
 // func TestParallelProcess(t *testing.T) {
 // 	begin := time.Now()
