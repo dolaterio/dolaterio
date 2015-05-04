@@ -15,3 +15,5 @@ dependencies:
     - docker pull ubuntu:14.04
     - docker run -d -p 28015:28015 rethinkdb:2.0
     - make dep-install
+  cache_directories:
+    - "/var/lib/docker/btrfs" # Docker images
