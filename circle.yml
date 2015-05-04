@@ -1,8 +1,10 @@
 machine:
   services:
     - docker
+    - redis
   environment:
     RETHINKDB_ADDRESS: localhost:28015
+    REDIS_ADDRESS: localhost:6379
 
 test:
   override:
