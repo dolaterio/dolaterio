@@ -47,3 +47,7 @@ func (q *redisQueue) Dequeue() (*Message, error) {
 		JobID: cmd.Val()[1],
 	}, nil
 }
+
+func (q *redisQueue) Close() error {
+	return q.client.Close()
+}
