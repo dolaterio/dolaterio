@@ -5,12 +5,14 @@ import (
 
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/dolaterio/dolaterio/docker"
+	"github.com/dolaterio/dolaterio/queue"
 )
 
 // JobRunner models a job runner
 type JobRunner struct {
 	engine      *docker.Engine
-	queue       chan *db.Job
+	queue       queue.Queue
+	jobs        chan *db.Job
 	stop        chan bool
 	concurrency int
 	stopped     bool
@@ -20,6 +22,7 @@ type JobRunner struct {
 type JobRunnerOptions struct {
 	Engine      *docker.Engine
 	Concurrency int
+	Queue       queue.Queue
 }
 
 var (
@@ -27,30 +30,41 @@ var (
 )
 
 // NewJobRunner build and initializes a runner
-func NewJobRunner(options *JobRunnerOptions) (*JobRunner, error) {
-	runner := &JobRunner{
+func NewJobRunner(options *JobRunnerOptions) *JobRunner {
+	return &JobRunner{
 		engine:      options.Engine,
 		concurrency: options.Concurrency,
-		queue:       make(chan *db.Job),
+		queue:       options.Queue,
+		jobs:        make(chan *db.Job),
 		stop:        make(chan bool),
 	}
+}
+
+func (runner *JobRunner) Start() {
 	for i := 0; i < runner.concurrency; i++ {
 		go runner.run()
 	}
-	return runner, nil
-}
 
-// Process processes the job.
-func (runner *JobRunner) Process(job *db.Job) error {
-	if runner.stopped {
-		return errJobRunnerStopped
-	}
-	runner.queue <- job
-	return nil
+	go func() {
+		var message *queue.Message
+		var job *db.Job
+		cont := true
+
+		for cont {
+			message, _ = runner.queue.Dequeue()
+			if message != nil {
+				job, _ = db.GetJob(message.JobID)
+				runner.jobs <- job
+			} else {
+				cont = false
+			}
+		}
+	}()
 }
 
 // Stop stops the job runner
 func (runner *JobRunner) Stop() {
+	runner.queue.Close()
 	runner.stopped = true
 	for i := 0; i < runner.concurrency; i++ {
 		runner.stop <- true
@@ -59,14 +73,19 @@ func (runner *JobRunner) Stop() {
 
 func (runner *JobRunner) run() {
 	var err error
+	var job *db.Job
 
 	for {
 		select {
-		case job := <-runner.queue:
+		case job = <-runner.jobs:
+			job.State = db.StateQueued
+			job.Update()
 			err = Run(job, runner.engine)
 			if err != nil {
 				job.Syserr = err.Error()
 			}
+			job.State = db.StateFinished
+			job.Update()
 		case <-runner.stop:
 			return
 		}

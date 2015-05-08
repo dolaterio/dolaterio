@@ -6,6 +6,7 @@ import (
 
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/dolaterio/dolaterio/docker"
+	"github.com/dolaterio/dolaterio/queue"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,36 +14,49 @@ func TestSimpleProcess(t *testing.T) {
 	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
-	runner, err := NewJobRunner(&JobRunnerOptions{
-		Engine:      engine,
-		Concurrency: 1,
-	})
+	q, err := queue.NewRedisQueue()
 	assert.Nil(t, err)
+	q.Empty()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"echo", "hello world"},
 	}
-
-	err = runner.Process(job)
+	err = job.Store()
 	assert.Nil(t, err)
-	assert.Empty(t, string(job.Stdout))
+
+	runner := NewJobRunner(&JobRunnerOptions{
+		Engine:      engine,
+		Concurrency: 1,
+		Queue:       q,
+	})
+	runner.Start()
+
+	q.Enqueue(&queue.Message{JobID: job.ID})
+	time.Sleep(10 * time.Millisecond)
+
 	runner.Stop()
+
+	job, err = db.GetJob(job.ID)
+	assert.Nil(t, err)
 
 	assert.Equal(t, string(job.Stdout), "hello world\n")
 }
 
 func TestParallelProcess(t *testing.T) {
-	begin := time.Now()
 
 	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
-	runner, err := NewJobRunner(&JobRunnerOptions{
+	q, err := queue.NewRedisQueue()
+	assert.Nil(t, err)
+	q.Empty()
+
+	runner := NewJobRunner(&JobRunnerOptions{
 		Engine:      engine,
 		Concurrency: 5,
+		Queue:       q,
 	})
-	assert.Nil(t, err)
 
 	jobs := make([]*db.Job, 5)
 	for i := 0; i < 5; i++ {
@@ -50,86 +64,91 @@ func TestParallelProcess(t *testing.T) {
 			DockerImage: "ubuntu:14.04",
 			Cmd:         []string{"sleep", "1"},
 		}
-		err = runner.Process(jobs[i])
-		assert.Nil(t, err)
+		jobs[i].Store()
+		q.Enqueue(&queue.Message{JobID: jobs[i].ID})
 	}
-	runner.Stop() // Waits for all tasks to finish
+
+	begin := time.Now()
+	runner.Start()
+	time.Sleep(1 * time.Second)
+	runner.Stop()
 
 	for i := 0; i < 5; i++ {
+		jobs[i], _ = db.GetJob(jobs[i].ID)
 		assert.Empty(t, jobs[i].Syserr)
 		assert.Empty(t, jobs[i].Stderr)
+		assert.Equal(t, jobs[i].State, db.StateFinished)
 	}
 	assert.WithinDuration(t, time.Now(), begin, 4*time.Second)
 }
 
-func TestEngineTimeoutDoesNotHang(t *testing.T) {
-	begin := time.Now()
-
+func TestEngineTimeout(t *testing.T) {
 	engine, err := docker.NewEngine(&docker.EngineConfig{
 		Timeout: 1 * time.Second,
 	})
 	assert.Nil(t, err)
 
-	runner, err := NewJobRunner(&JobRunnerOptions{
-		Engine:      engine,
-		Concurrency: 1,
-	})
+	q, err := queue.NewRedisQueue()
 	assert.Nil(t, err)
+	q.Empty()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"sleep", "10"},
 	}
-
-	err = runner.Process(job)
+	err = job.Store()
 	assert.Nil(t, err)
+
+	runner := NewJobRunner(&JobRunnerOptions{
+		Engine:      engine,
+		Concurrency: 1,
+		Queue:       q,
+	})
+	begin := time.Now()
+	runner.Start()
+
+	q.Enqueue(&queue.Message{JobID: job.ID})
+	time.Sleep(100 * time.Millisecond)
+
 	runner.Stop()
+
+	job, err = db.GetJob(job.ID)
+	assert.NotEmpty(t, job.Syserr)
 
 	assert.WithinDuration(t, time.Now(), begin, 4*time.Second)
 }
 
-func TestJobTimeoutDoesNotHang(t *testing.T) {
-	begin := time.Now()
-
+func TestJobTimeout(t *testing.T) {
 	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
-	runner, err := NewJobRunner(&JobRunnerOptions{
-		Engine:      engine,
-		Concurrency: 1,
-	})
+	q, err := queue.NewRedisQueue()
 	assert.Nil(t, err)
+	q.Empty()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"sleep", "10"},
 		Timeout:     1 * time.Second,
 	}
-
-	err = runner.Process(job)
-	assert.Nil(t, err)
-	runner.Stop()
-
-	assert.WithinDuration(t, time.Now(), begin, 4*time.Second)
-}
-
-func TestFailsProcessingAfterStop(t *testing.T) {
-	engine, err := docker.NewEngine(&docker.EngineConfig{})
+	err = job.Store()
 	assert.Nil(t, err)
 
-	runner, err := NewJobRunner(&JobRunnerOptions{
+	runner := NewJobRunner(&JobRunnerOptions{
 		Engine:      engine,
 		Concurrency: 1,
+		Queue:       q,
 	})
-	assert.Nil(t, err)
+	begin := time.Now()
+	runner.Start()
+
+	q.Enqueue(&queue.Message{JobID: job.ID})
+	time.Sleep(100 * time.Millisecond)
 
 	runner.Stop()
 
-	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"echo", "hello world"},
-	}
+	job, err = db.GetJob(job.ID)
+	assert.NotEmpty(t, job.Syserr)
 
-	err = runner.Process(job)
-	assert.NotNil(t, err)
+	assert.WithinDuration(t, time.Now(), begin, 4*time.Second)
 }

@@ -5,6 +5,7 @@ type Queue interface {
 	Enqueue(*Message) error
 	Dequeue() (*Message, error)
 	Close() error
+	Empty() error
 }
 
 // Message are the messages sent trough the message queue

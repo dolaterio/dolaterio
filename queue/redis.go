@@ -29,6 +29,14 @@ func NewRedisQueue() (Queue, error) {
 	}, nil
 }
 
+func (q *redisQueue) Empty() error {
+	cmd := q.client.Del(q.queueKey)
+	if cmd.Err() != nil {
+		return cmd.Err()
+	}
+	return nil
+}
+
 func (q *redisQueue) Enqueue(message *Message) error {
 	cmd := q.client.RPush(q.queueKey, message.JobID)
 	if cmd.Err() != nil {
