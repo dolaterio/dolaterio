@@ -14,9 +14,7 @@ func TestSimpleProcess(t *testing.T) {
 	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
-	q, err := queue.NewRedisQueue()
-	assert.Nil(t, err)
-	q.Empty()
+	q := newFakeQueue()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
@@ -48,9 +46,7 @@ func TestParallelProcess(t *testing.T) {
 	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
-	q, err := queue.NewRedisQueue()
-	assert.Nil(t, err)
-	q.Empty()
+	q := newFakeQueue()
 
 	runner := NewJobRunner(&JobRunnerOptions{
 		Engine:      engine,
@@ -88,9 +84,7 @@ func TestEngineTimeout(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	q, err := queue.NewRedisQueue()
-	assert.Nil(t, err)
-	q.Empty()
+	q := newFakeQueue()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
@@ -122,9 +116,7 @@ func TestJobTimeout(t *testing.T) {
 	engine, err := docker.NewEngine(&docker.EngineConfig{})
 	assert.Nil(t, err)
 
-	q, err := queue.NewRedisQueue()
-	assert.Nil(t, err)
-	q.Empty()
+	q := newFakeQueue()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
