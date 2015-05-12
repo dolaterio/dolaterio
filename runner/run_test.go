@@ -10,6 +10,9 @@ import (
 )
 
 func TestRunEcho(t *testing.T) {
+	setup()
+	defer clean()
+
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"echo", "hello world"},
@@ -24,6 +27,8 @@ func TestRunEcho(t *testing.T) {
 }
 
 func TestRunEnv(t *testing.T) {
+	setup()
+	defer clean()
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"env"},
@@ -39,6 +44,8 @@ func TestRunEnv(t *testing.T) {
 }
 
 func TestRunStdin(t *testing.T) {
+	setup()
+	defer clean()
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"cat"},
@@ -53,6 +60,8 @@ func TestRunStdin(t *testing.T) {
 }
 
 func TestRunStderr(t *testing.T) {
+	setup()
+	defer clean()
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"bash", "-c", "echo hello world >&2"},
@@ -66,6 +75,8 @@ func TestRunStderr(t *testing.T) {
 }
 
 func TestRunTimeout(t *testing.T) {
+	setup()
+	defer clean()
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"sleep", "2000"},

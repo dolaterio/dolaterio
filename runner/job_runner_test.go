@@ -5,22 +5,19 @@ import (
 	"time"
 
 	"github.com/dolaterio/dolaterio/db"
-	"github.com/dolaterio/dolaterio/docker"
 	"github.com/dolaterio/dolaterio/queue"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSimpleProcess(t *testing.T) {
-	engine, err := docker.NewEngine(&docker.EngineConfig{})
-	assert.Nil(t, err)
-
-	q := newFakeQueue()
+	setup()
+	defer clean()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"echo", "hello world"},
 	}
-	err = job.Store(dbConnection)
+	err := job.Store(dbConnection)
 	assert.Nil(t, err)
 
 	runner := NewJobRunner(&JobRunnerOptions{
@@ -43,11 +40,8 @@ func TestSimpleProcess(t *testing.T) {
 }
 
 func TestParallelProcess(t *testing.T) {
-
-	engine, err := docker.NewEngine(&docker.EngineConfig{})
-	assert.Nil(t, err)
-
-	q := newFakeQueue()
+	setup()
+	defer clean()
 
 	runner := NewJobRunner(&JobRunnerOptions{
 		DbConnection: dbConnection,
@@ -81,18 +75,15 @@ func TestParallelProcess(t *testing.T) {
 }
 
 func TestEngineTimeout(t *testing.T) {
-	engine, err := docker.NewEngine(&docker.EngineConfig{
-		Timeout: 1 * time.Second,
-	})
-	assert.Nil(t, err)
-
-	q := newFakeQueue()
+	setup()
+	defer clean()
+	engine.Timeout = 1 * time.Second
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"sleep", "10"},
 	}
-	err = job.Store(dbConnection)
+	err := job.Store(dbConnection)
 	assert.Nil(t, err)
 
 	runner := NewJobRunner(&JobRunnerOptions{
@@ -116,17 +107,15 @@ func TestEngineTimeout(t *testing.T) {
 }
 
 func TestJobTimeout(t *testing.T) {
-	engine, err := docker.NewEngine(&docker.EngineConfig{})
-	assert.Nil(t, err)
-
-	q := newFakeQueue()
+	setup()
+	defer clean()
 
 	job := &db.Job{
 		DockerImage: "ubuntu:14.04",
 		Cmd:         []string{"sleep", "10"},
 		Timeout:     1 * time.Second,
 	}
-	err = job.Store(dbConnection)
+	err := job.Store(dbConnection)
 	assert.Nil(t, err)
 
 	runner := NewJobRunner(&JobRunnerOptions{
