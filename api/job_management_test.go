@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/dolaterio/dolaterio/db"
-	"github.com/dolaterio/dolaterio/runner"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -51,42 +50,39 @@ func fetchJob(t *testing.T, id string) *db.Job {
 }
 
 func TestCreateAndFetchJob(t *testing.T) {
-	runner := runner.NewJobRunner(&runner.JobRunnerOptions{
-		Engine:       engine,
-		Concurrency:  1,
-		Queue:        q,
-		DbConnection: dbConn,
-	})
-	runner.Start()
+	setup()
+	defer clean()
 
 	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\"}")
 	job = fetchJob(t, job.ID)
 	assert.Equal(t, db.StatusFinished, job.Status)
 }
 
-// func TestCreateAndFetchJobWithStdin(t *testing.T) {
-// 	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"stdin\":\"hello world\"}")
-// 	job = fetchJob(t, job.ID)
+func TestCreateAndFetchJobWithStdin(t *testing.T) {
+	setup()
+	defer clean()
 
-// 	if !strings.Contains(job.Stdout, "hello world") {
-// 		t.Fatalf("Expected %v to contain %v", job.Stdout, "hello world")
-// 	}
-// }
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"stdin\":\"hello world\"}")
+	job = fetchJob(t, job.ID)
 
-// func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
-// 	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"env\":{\"HELLO\":\"world\"}}")
-// 	job = fetchJob(t, job.ID)
+	assert.Contains(t, job.Stdout, "hello world")
+}
 
-// 	if !strings.Contains(job.Stdout, "HELLO: 'world'") {
-// 		t.Fatalf("Expected %v to contain %v", job.Stdout, "HELLO: 'world'")
-// 	}
-// }
+func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
+	setup()
+	defer clean()
 
-// func TestCreateAndFetchJobWithTimeout(t *testing.T) {
-// 	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"timeout\":10}")
-// 	job = fetchJob(t, job.ID)
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"env\":{\"HELLO\":\"world\"}}")
+	job = fetchJob(t, job.ID)
+	assert.Contains(t, job.Stdout, "HELLO: 'world'")
+}
 
-// 	if job.Syserr != "timeout" {
-// 		t.Fatal("Expected job to timeout")
-// 	}
-// }
+func TestCreateAndFetchJobWithTimeout(t *testing.T) {
+	setup()
+	defer clean()
+
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"timeout\":10}")
+	job = fetchJob(t, job.ID)
+
+	assert.Equal(t, "timeout", job.Syserr)
+}

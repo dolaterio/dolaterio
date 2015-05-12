@@ -72,6 +72,10 @@ func NewConnection(conf *ConnectionConfig) (*Connection, error) {
 	return connection, nil
 }
 
+func (c *Connection) Close() {
+	c.s.Close()
+}
+
 func arrContainsString(arr []string, val string) bool {
 	for _, it := range arr {
 		if it == val {
