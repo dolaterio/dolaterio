@@ -1,48 +1,67 @@
 package main
 
-// func createJob(t *testing.T, body string) *Job {
+import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
 
-// 	req, _ := http.NewRequest("POST", "/v1/jobs", bytes.NewBufferString(body))
+	"github.com/dolaterio/dolaterio/db"
+	"github.com/dolaterio/dolaterio/runner"
+	"github.com/stretchr/testify/assert"
+)
 
-// 	w := httptest.NewRecorder()
-// 	handler.ServeHTTP(w, req)
+func createJob(t *testing.T, body string) *db.Job {
+	req, _ := http.NewRequest("POST", "/v1/jobs", bytes.NewBufferString(body))
 
-// 	decoder := json.NewDecoder(w.Body)
-// 	var job Job
-// 	decoder.Decode(&job)
-// 	return &job
-// }
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
 
-// func fetchJobTimeout(t *testing.T, id string, attempts int) *Job {
-// 	if attempts <= 0 {
-// 		t.Fatal("The job has not completed")
-// 	}
-// 	req, _ := http.NewRequest("GET", "/v1/jobs/"+id, nil)
+	decoder := json.NewDecoder(w.Body)
+	var job db.Job
+	decoder.Decode(&job)
+	return &job
+}
 
-// 	w := httptest.NewRecorder()
-// 	handler.ServeHTTP(w, req)
+func fetchJob(t *testing.T, id string) *db.Job {
+	attempts := 50
 
-// 	decoder := json.NewDecoder(w.Body)
-// 	var job Job
-// 	decoder.Decode(&job)
-// 	if job.Status != "completed" {
-// 		time.Sleep(100 * time.Millisecond)
-// 		return fetchJobTimeout(t, id, attempts-1)
-// 	}
-// 	return &job
-// }
+	for attempts > 0 {
+		var job db.Job
 
-// func fetchJob(t *testing.T, id string) *Job {
-// 	return fetchJobTimeout(t, id, 50)
-// }
+		req, err := http.NewRequest("GET", "/v1/jobs/"+id, nil)
+		assert.Nil(t, err)
 
-// func TestCreateAndFetchJob(t *testing.T) {
-// 	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\"}")
-// 	job = fetchJob(t, job.ID)
-// 	if len(job.Stdout) == 0 {
-// 		t.Fatal("The job has no output")
-// 	}
-// }
+		w := httptest.NewRecorder()
+		handler.ServeHTTP(w, req)
+		decoder := json.NewDecoder(w.Body)
+		decoder.Decode(&job)
+
+		if job.Status == db.StatusFinished {
+			return &job
+		}
+
+		time.Sleep(100 * time.Millisecond)
+		attempts--
+	}
+	t.Fatal("The job has not completed")
+	return nil
+}
+
+func TestCreateAndFetchJob(t *testing.T) {
+	runner := runner.NewJobRunner(&runner.JobRunnerOptions{
+		Engine:      engine,
+		Concurrency: 1,
+		Queue:       q,
+	})
+	runner.Start()
+
+	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\"}")
+	job = fetchJob(t, job.ID)
+	assert.Equal(t, db.StatusFinished, job.Status)
+}
 
 // func TestCreateAndFetchJobWithStdin(t *testing.T) {
 // 	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"stdin\":\"hello world\"}")

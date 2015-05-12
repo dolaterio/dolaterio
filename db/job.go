@@ -5,7 +5,6 @@ import "time"
 // Job is the model struct for jobs
 type Job struct {
 	ID          string            `gorethink:"id,omitempty" json:"id"`
-	State       string            `gorethink:"state" json:"state"`
 	Status      string            `gorethink:"status" json:"status"`
 	DockerImage string            `gorethink:"docker_image" json:"docker_image"`
 	Cmd         []string          `gorethink:"cmd" json:"cmd"`
@@ -18,9 +17,9 @@ type Job struct {
 }
 
 const (
-	StateQueued   = "queued"
-	StateRunning  = "running"
-	StateFinished = "finished"
+	StatusQueued   = "queued"
+	StatusRunning  = "running"
+	StatusFinished = "finished"
 )
 
 // GetJob returns a job from the db
@@ -51,7 +50,7 @@ func (job *Job) Store() error {
 	if err != nil {
 		return err
 	}
-	job.State = StateQueued
+	job.Status = StatusQueued
 
 	res, err := jobsTable.Insert(job).RunWrite(s)
 	if err != nil {

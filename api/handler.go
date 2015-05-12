@@ -3,17 +3,23 @@ package main
 import (
 	"net/http"
 
+	"github.com/dolaterio/dolaterio/docker"
+	"github.com/dolaterio/dolaterio/queue"
 	"github.com/gorilla/mux"
 )
 
-// Handler returns the http handler to serve the dolater.io API
-func Handler() http.Handler {
+type apiHandler struct {
+	q      queue.Queue
+	engine *docker.Engine
+}
+
+func (api *apiHandler) rootHandler() http.Handler {
 	r := mux.NewRouter()
 	v1 := r.PathPrefix("/v1").Subrouter()
 
 	jobs := v1.PathPrefix("/jobs").Subrouter()
-	jobs.Methods("POST").HandlerFunc(jobsCreateHandler)
-	jobs.Methods("GET").Path("/{id}").HandlerFunc(jobsIndexHandler)
+	jobs.Methods("POST").HandlerFunc(api.jobsCreateHandler)
+	jobs.Methods("GET").Path("/{id}").HandlerFunc(api.jobsIndexHandler)
 
 	return r
 }

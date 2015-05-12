@@ -78,13 +78,13 @@ func (runner *JobRunner) run() {
 	for {
 		select {
 		case job = <-runner.jobs:
-			job.State = db.StateQueued
+			job.Status = db.StatusQueued
 			job.Update()
 			err = Run(job, runner.engine)
 			if err != nil {
 				job.Syserr = err.Error()
 			}
-			job.State = db.StateFinished
+			job.Status = db.StatusFinished
 			job.Update()
 		case <-runner.stop:
 			return

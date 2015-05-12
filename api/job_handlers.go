@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dolaterio/dolaterio/db"
+	"github.com/dolaterio/dolaterio/queue"
 	"github.com/gorilla/mux"
 )
 
@@ -17,7 +18,7 @@ type jobObjectRequest struct {
 	Env         map[string]string `json:"env"`
 }
 
-func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
+func (api *apiHandler) jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	var jobReq jobObjectRequest
 	decoder.Decode(&jobReq)
@@ -30,15 +31,18 @@ func jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
 		Status:      "pending",
 	}
 	err := job.Store()
+	api.q.Enqueue(&queue.Message{
+		JobID: job.ID,
+	})
 	if err != nil {
 		renderError(res, err, 500)
 		return
 	}
 
-	renderJob(res, job)
+	api.renderJob(res, job)
 }
 
-func jobsIndexHandler(res http.ResponseWriter, req *http.Request) {
+func (api *apiHandler) jobsIndexHandler(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	job, err := db.GetJob(vars["id"])
 
@@ -52,10 +56,10 @@ func jobsIndexHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	renderJob(res, job)
+	api.renderJob(res, job)
 }
 
-func renderJob(res http.ResponseWriter, job *db.Job) {
+func (api *apiHandler) renderJob(res http.ResponseWriter, job *db.Job) {
 	res.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(res)
 	encoder.Encode(job)

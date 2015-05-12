@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/dolaterio/dolaterio/db"
+	"github.com/dolaterio/dolaterio/docker"
+	"github.com/dolaterio/dolaterio/queue"
 )
 
 var (
@@ -22,7 +24,22 @@ func main() {
 		log.Fatal("Failure to connect to db: ", err)
 	}
 
-	http.Handle("/", Handler())
+	q, err := queue.NewRedisQueue()
+	if err != nil {
+		log.Fatal("Failure to connect to the queue: ", err)
+	}
+
+	engine, err := docker.NewEngine(&docker.EngineConfig{})
+	if err != nil {
+		log.Fatal("Failure to connect to docker: ", err)
+	}
+
+	handler := &apiHandler{
+		engine: engine,
+		q:      q,
+	}
+
+	http.Handle("/", handler.rootHandler())
 	address := fmt.Sprintf("%v:%v", *bind, *port)
 
 	fmt.Printf("Serving dolater.io api on %v\n", address)

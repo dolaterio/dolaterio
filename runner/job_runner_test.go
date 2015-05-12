@@ -73,7 +73,7 @@ func TestParallelProcess(t *testing.T) {
 		jobs[i], _ = db.GetJob(jobs[i].ID)
 		assert.Empty(t, jobs[i].Syserr)
 		assert.Empty(t, jobs[i].Stderr)
-		assert.Equal(t, jobs[i].State, db.StateFinished)
+		assert.Equal(t, jobs[i].Status, db.StatusFinished)
 	}
 	assert.WithinDuration(t, time.Now(), begin, 4*time.Second)
 }
