@@ -7,17 +7,17 @@ import (
 )
 
 func TestStoreJob(t *testing.T) {
-	err := Connect()
+	c, err := NewConnection(&ConnectionConfig{})
 	assert.Nil(t, err)
 
 	job1 := &Job{
 		DockerImage: "ubuntu:14.04",
 	}
-	err = job1.Store()
+	err = job1.Store(c)
 	assert.Nil(t, err)
 	assert.NotNil(t, job1.ID)
 
-	job2, err := GetJob(job1.ID)
+	job2, err := GetJob(c, job1.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, job1.ID, job2.ID)
 	assert.Equal(t, job1.DockerImage, job2.DockerImage)

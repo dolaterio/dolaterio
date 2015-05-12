@@ -1,53 +1,43 @@
 package db
 
-import (
-	"errors"
-	"os"
+import "github.com/dancannon/gorethink"
 
-	"github.com/dancannon/gorethink"
-)
-
-var (
+// Connection represents a connection to the database
+type Connection struct {
 	s         *gorethink.Session
 	db        gorethink.Term
 	jobsTable gorethink.Term
+}
 
-	errInvalidDbAddress = errors.New(
-		"Invalid RethinkDB address. Please make sure $RETHINKDB_ADDRESS is properly set.")
-)
-
-// Connect initializes the DB connection
-func Connect() error {
-	if s != nil {
-		// It's already connected
-		return nil
-	}
-
-	address := os.Getenv("RETHINKDB_ADDRESS")
-	if address == "" {
-		return errInvalidDbAddress
+// NewConnection initializes and returns a DB connection ready to use
+func NewConnection(conf *ConnectionConfig) (*Connection, error) {
+	conf.defaults()
+	if err := conf.errors(); err != nil {
+		return nil, err
 	}
 
 	// Open a session to the DB
-	session, err := gorethink.Connect(gorethink.ConnectOpts{
-		Address:  os.Getenv("RETHINKDB_ADDRESS"),
+	s, err := gorethink.Connect(gorethink.ConnectOpts{
+		Address:  conf.RethinkDbAddress,
 		Database: "dolaterio",
 		MaxIdle:  10,
 		MaxOpen:  10,
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	session.SetMaxOpenConns(5)
+	connection := &Connection{
+		s: s,
+	}
 
-	s = session
+	s.SetMaxOpenConns(5)
 
 	// Get the db (and create if missing)
 	q, err := gorethink.DbList().Run(s)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var databases []string
@@ -56,30 +46,30 @@ func Connect() error {
 	if !arrContainsString(databases, "dolaterio") {
 		_, err = gorethink.DbCreate("dolaterio").RunWrite(s)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 	}
 
-	db = gorethink.Db("dolaterio")
+	connection.db = gorethink.Db("dolaterio")
 
 	// Get tables (and create if missing)
-	q, err = db.TableList().Run(s)
+	q, err = connection.db.TableList().Run(s)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var tables []string
 	q.All(&tables)
 
 	if !arrContainsString(tables, "jobs") {
-		_, err = db.TableCreate("jobs").RunWrite(s)
+		_, err = connection.db.TableCreate("jobs").RunWrite(s)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
-	jobsTable = db.Table("jobs")
+	connection.jobsTable = connection.db.Table("jobs")
 
-	return nil
+	return connection, nil
 }
 
 func arrContainsString(arr []string, val string) bool {

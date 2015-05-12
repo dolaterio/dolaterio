@@ -10,19 +10,21 @@ import (
 
 // JobRunner models a job runner
 type JobRunner struct {
-	engine      *docker.Engine
-	queue       queue.Queue
-	jobs        chan *db.Job
-	stop        chan bool
-	concurrency int
-	stopped     bool
+	engine       *docker.Engine
+	queue        queue.Queue
+	dbConnection *db.Connection
+	jobs         chan *db.Job
+	stop         chan bool
+	concurrency  int
+	stopped      bool
 }
 
 // JobRunnerOptions models the data required to initialize a JobRunner
 type JobRunnerOptions struct {
-	Engine      *docker.Engine
-	Concurrency int
-	Queue       queue.Queue
+	DbConnection *db.Connection
+	Engine       *docker.Engine
+	Concurrency  int
+	Queue        queue.Queue
 }
 
 var (
@@ -32,14 +34,16 @@ var (
 // NewJobRunner build and initializes a runner
 func NewJobRunner(options *JobRunnerOptions) *JobRunner {
 	return &JobRunner{
-		engine:      options.Engine,
-		concurrency: options.Concurrency,
-		queue:       options.Queue,
-		jobs:        make(chan *db.Job),
-		stop:        make(chan bool),
+		engine:       options.Engine,
+		concurrency:  options.Concurrency,
+		queue:        options.Queue,
+		dbConnection: options.DbConnection,
+		jobs:         make(chan *db.Job),
+		stop:         make(chan bool),
 	}
 }
 
+// Start starts the runner, so will start consuming and processing tasks
 func (runner *JobRunner) Start() {
 	for i := 0; i < runner.concurrency; i++ {
 		go runner.run()
@@ -53,7 +57,7 @@ func (runner *JobRunner) Start() {
 		for cont {
 			message, _ = runner.queue.Dequeue()
 			if message != nil {
-				job, _ = db.GetJob(message.JobID)
+				job, _ = db.GetJob(runner.dbConnection, message.JobID)
 				runner.jobs <- job
 			} else {
 				cont = false
@@ -79,13 +83,13 @@ func (runner *JobRunner) run() {
 		select {
 		case job = <-runner.jobs:
 			job.Status = db.StatusQueued
-			job.Update()
+			job.Update(runner.dbConnection)
 			err = Run(job, runner.engine)
 			if err != nil {
 				job.Syserr = err.Error()
 			}
 			job.Status = db.StatusFinished
-			job.Update()
+			job.Update(runner.dbConnection)
 		case <-runner.stop:
 			return
 		}

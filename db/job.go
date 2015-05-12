@@ -23,13 +23,8 @@ const (
 )
 
 // GetJob returns a job from the db
-func GetJob(id string) (*Job, error) {
-	err := Connect()
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := jobsTable.Get(id).Run(s)
+func GetJob(c *Connection, id string) (*Job, error) {
+	res, err := c.jobsTable.Get(id).Run(c.s)
 	if err != nil {
 		return nil, err
 	}
@@ -45,14 +40,10 @@ func GetJob(id string) (*Job, error) {
 }
 
 // Store inserts the job into the db
-func (job *Job) Store() error {
-	err := Connect()
-	if err != nil {
-		return err
-	}
+func (job *Job) Store(c *Connection) error {
 	job.Status = StatusQueued
 
-	res, err := jobsTable.Insert(job).RunWrite(s)
+	res, err := c.jobsTable.Insert(job).RunWrite(c.s)
 	if err != nil {
 		return err
 	}
@@ -65,13 +56,8 @@ func (job *Job) Store() error {
 }
 
 // Update updates the job into the db.
-func (job *Job) Update() error {
-	err := Connect()
-	if err != nil {
-		return err
-	}
-
-	_, err = jobsTable.Update(job).RunWrite(s)
+func (job *Job) Update(c *Connection) error {
+	_, err := c.jobsTable.Update(job).RunWrite(c.s)
 	if err != nil {
 		return err
 	}

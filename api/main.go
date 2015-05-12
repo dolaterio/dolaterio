@@ -19,7 +19,7 @@ var (
 func main() {
 	flag.Parse()
 
-	err := db.Connect()
+	dbConnection, err := db.NewConnection(&db.ConnectionConfig{})
 	if err != nil {
 		log.Fatal("Failure to connect to db: ", err)
 	}
@@ -35,8 +35,9 @@ func main() {
 	}
 
 	handler := &apiHandler{
-		engine: engine,
-		q:      q,
+		engine:       engine,
+		q:            q,
+		dbConnection: dbConnection,
 	}
 
 	http.Handle("/", handler.rootHandler())

@@ -30,7 +30,7 @@ func (api *apiHandler) jobsCreateHandler(res http.ResponseWriter, req *http.Requ
 		Timeout:     time.Duration(jobReq.Timeout) * time.Millisecond,
 		Status:      "pending",
 	}
-	err := job.Store()
+	err := job.Store(api.dbConnection)
 	api.q.Enqueue(&queue.Message{
 		JobID: job.ID,
 	})
@@ -44,7 +44,7 @@ func (api *apiHandler) jobsCreateHandler(res http.ResponseWriter, req *http.Requ
 
 func (api *apiHandler) jobsIndexHandler(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
-	job, err := db.GetJob(vars["id"])
+	job, err := db.GetJob(api.dbConnection, vars["id"])
 
 	if err != nil {
 		renderError(res, err, 500)

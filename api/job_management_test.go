@@ -52,9 +52,10 @@ func fetchJob(t *testing.T, id string) *db.Job {
 
 func TestCreateAndFetchJob(t *testing.T) {
 	runner := runner.NewJobRunner(&runner.JobRunnerOptions{
-		Engine:      engine,
-		Concurrency: 1,
-		Queue:       q,
+		Engine:       engine,
+		Concurrency:  1,
+		Queue:        q,
+		DbConnection: dbConn,
 	})
 	runner.Start()
 

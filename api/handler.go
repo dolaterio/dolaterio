@@ -3,14 +3,16 @@ package main
 import (
 	"net/http"
 
+	"github.com/dolaterio/dolaterio/db"
 	"github.com/dolaterio/dolaterio/docker"
 	"github.com/dolaterio/dolaterio/queue"
 	"github.com/gorilla/mux"
 )
 
 type apiHandler struct {
-	q      queue.Queue
-	engine *docker.Engine
+	dbConnection *db.Connection
+	q            queue.Queue
+	engine       *docker.Engine
 }
 
 func (api *apiHandler) rootHandler() http.Handler {
