@@ -53,7 +53,7 @@ func TestCreateAndFetchJob(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\"}")
+	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker"}`)
 	job = fetchJob(t, job.ID)
 	assert.Equal(t, db.StatusFinished, job.Status)
 }
@@ -62,7 +62,7 @@ func TestCreateAndFetchJobWithStdin(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"stdin\":\"hello world\"}")
+	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","stdin":"hello world"}`)
 	job = fetchJob(t, job.ID)
 
 	assert.Contains(t, job.Stdout, "hello world")
@@ -72,7 +72,7 @@ func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"env\":{\"HELLO\":\"world\"}}")
+	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","env":{"HELLO":"world"}}`)
 	job = fetchJob(t, job.ID)
 	assert.Contains(t, job.Stdout, "HELLO: 'world'")
 }
@@ -81,7 +81,7 @@ func TestCreateAndFetchJobWithTimeout(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, "{\"docker_image\":\"dolaterio/dummy-worker\",\"timeout\":10}")
+	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","timeout":10}`)
 	job = fetchJob(t, job.ID)
 
 	assert.Equal(t, "timeout", job.Syserr)
