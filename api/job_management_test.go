@@ -50,7 +50,7 @@ func fetchJob(t *testing.T, id string) *db.Job {
 }
 
 func TestCreateAndFetchJob(t *testing.T) {
-	setup()
+	setup(t)
 	defer clean()
 
 	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker"}`)
@@ -59,7 +59,7 @@ func TestCreateAndFetchJob(t *testing.T) {
 }
 
 func TestCreateAndFetchJobWithStdin(t *testing.T) {
-	setup()
+	setup(t)
 	defer clean()
 
 	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","stdin":"hello world"}`)
@@ -69,7 +69,7 @@ func TestCreateAndFetchJobWithStdin(t *testing.T) {
 }
 
 func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
-	setup()
+	setup(t)
 	defer clean()
 
 	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","env":{"HELLO":"world"}}`)
@@ -78,7 +78,7 @@ func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
 }
 
 func TestCreateAndFetchJobWithTimeout(t *testing.T) {
-	setup()
+	setup(t)
 	defer clean()
 
 	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","timeout":10}`)

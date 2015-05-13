@@ -1,9 +1,12 @@
 package runner
 
 import (
+	"testing"
+
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/dolaterio/dolaterio/docker"
 	"github.com/dolaterio/dolaterio/queue"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -21,4 +24,12 @@ func setup() {
 func clean() {
 	dbConnection.Close()
 	q.Close()
+}
+
+func logErrors(t *testing.T, errors chan error) {
+	go func() {
+		for err := range errors {
+			assert.Nil(t, err)
+		}
+	}()
 }

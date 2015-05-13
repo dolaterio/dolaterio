@@ -17,6 +17,8 @@ type JobRunner struct {
 	stop         chan bool
 	concurrency  int
 	stopped      bool
+
+	Errors chan error
 }
 
 // JobRunnerOptions models the data required to initialize a JobRunner
@@ -40,6 +42,7 @@ func NewJobRunner(options *JobRunnerOptions) *JobRunner {
 		dbConnection: options.DbConnection,
 		jobs:         make(chan *db.Job),
 		stop:         make(chan bool),
+		Errors:       make(chan error),
 	}
 }
 
@@ -52,13 +55,18 @@ func (runner *JobRunner) Start() {
 	go func() {
 		var message *queue.Message
 		var job *db.Job
+		var err error
 		cont := true
 
 		for cont {
 			message, _ = runner.queue.Dequeue()
 			if message != nil {
-				job, _ = db.GetJob(runner.dbConnection, message.JobID)
-				runner.jobs <- job
+				job, err = db.GetJob(runner.dbConnection, message.JobID)
+				if err != nil {
+					runner.Errors <- err
+				} else {
+					runner.jobs <- job
+				}
 			} else {
 				cont = false
 			}
@@ -73,6 +81,8 @@ func (runner *JobRunner) Stop() {
 	for i := 0; i < runner.concurrency; i++ {
 		runner.stop <- true
 	}
+	close(runner.jobs)
+	close(runner.Errors)
 }
 
 func (runner *JobRunner) run() {
