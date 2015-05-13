@@ -27,7 +27,7 @@ func TestSimpleProcess(t *testing.T) {
 		Queue:        q,
 	})
 	runner.Start()
-	logErrors(t, runner.Errors)
+	logErrors(runner.Errors)
 
 	q.Enqueue(&queue.Message{JobID: job.ID})
 	time.Sleep(10 * time.Millisecond)
@@ -63,7 +63,7 @@ func TestParallelProcess(t *testing.T) {
 
 	begin := time.Now()
 	runner.Start()
-	logErrors(t, runner.Errors)
+	logErrors(runner.Errors)
 	time.Sleep(1 * time.Second)
 	runner.Stop()
 
@@ -96,7 +96,7 @@ func TestEngineTimeout(t *testing.T) {
 	})
 	begin := time.Now()
 	runner.Start()
-	logErrors(t, runner.Errors)
+	logErrors(runner.Errors)
 
 	q.Enqueue(&queue.Message{JobID: job.ID})
 	time.Sleep(100 * time.Millisecond)
@@ -129,7 +129,7 @@ func TestJobTimeout(t *testing.T) {
 	})
 	begin := time.Now()
 	runner.Start()
-	logErrors(t, runner.Errors)
+	logErrors(runner.Errors)
 
 	q.Enqueue(&queue.Message{JobID: job.ID})
 	time.Sleep(100 * time.Millisecond)

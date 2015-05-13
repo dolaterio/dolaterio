@@ -2,13 +2,11 @@ package main
 
 import (
 	"net/http"
-	"testing"
 
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/dolaterio/dolaterio/docker"
 	"github.com/dolaterio/dolaterio/queue"
 	"github.com/dolaterio/dolaterio/runner"
-	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -19,7 +17,7 @@ var (
 	jobRunner *runner.JobRunner
 )
 
-func setup(t *testing.T) {
+func setup() {
 	engine, _ = docker.NewEngine(&docker.EngineConfig{})
 	q, _ = queue.NewRedisQueue()
 	dbConn, _ = db.NewConnection(&db.ConnectionConfig{})
@@ -40,7 +38,7 @@ func setup(t *testing.T) {
 	jobRunner.Start()
 	go func() {
 		for err := range jobRunner.Errors {
-			assert.Nil(t, err)
+			panic(err)
 		}
 	}()
 }
