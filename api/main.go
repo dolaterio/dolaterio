@@ -19,7 +19,7 @@ var (
 func main() {
 	flag.Parse()
 
-	dbConnection, err := db.NewConnection(&db.ConnectionConfig{})
+	dbConnection, err := db.NewConnection()
 	if err != nil {
 		log.Fatal("Failure to connect to db: ", err)
 	}

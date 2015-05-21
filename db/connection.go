@@ -1,6 +1,9 @@
 package db
 
-import "github.com/dancannon/gorethink"
+import (
+	"github.com/dancannon/gorethink"
+	"github.com/dolaterio/dolaterio/core"
+)
 
 // Connection represents a connection to the database
 type Connection struct {
@@ -10,15 +13,10 @@ type Connection struct {
 }
 
 // NewConnection initializes and returns a DB connection ready to use
-func NewConnection(conf *ConnectionConfig) (*Connection, error) {
-	conf.defaults()
-	if err := conf.errors(); err != nil {
-		return nil, err
-	}
-
+func NewConnection() (*Connection, error) {
 	// Open a session to the DB
 	s, err := gorethink.Connect(gorethink.ConnectOpts{
-		Address:  conf.RethinkDbAddress,
+		Address:  core.Config.RethinkDbAddress,
 		Database: "dolaterio",
 		MaxIdle:  10,
 		MaxOpen:  10,

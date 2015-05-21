@@ -20,7 +20,7 @@ var (
 func setup() {
 	engine, _ = docker.NewEngine(&docker.EngineConfig{})
 	q, _ = queue.NewRedisQueue()
-	dbConn, _ = db.NewConnection(&db.ConnectionConfig{})
+	dbConn, _ = db.NewConnection()
 
 	api := &apiHandler{
 		dbConnection: dbConn,

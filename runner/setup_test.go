@@ -13,7 +13,7 @@ var (
 )
 
 func setup() {
-	dbConnection, _ = db.NewConnection(&db.ConnectionConfig{})
+	dbConnection, _ = db.NewConnection()
 	engine, _ = docker.NewEngine(&docker.EngineConfig{})
 	q = newFakeQueue()
 }
