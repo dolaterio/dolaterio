@@ -33,6 +33,14 @@ func init() {
 
 	viper.SetDefault("taskTimeout", 30*time.Second)
 
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("config")
+	viper.AddConfigPath("../")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+
 	Config = ConfigStore{
 		RedisAddress:     viper.GetString("redisAddress"),
 		RethinkDbAddress: viper.GetString("rethinkdbAddress"),
