@@ -7,7 +7,7 @@ import (
 )
 
 func TestStoreJob(t *testing.T) {
-	c, err := NewConnection(&ConnectionConfig{})
+	c, err := NewConnection()
 	assert.Nil(t, err)
 
 	job1 := &Job{

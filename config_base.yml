@@ -1,0 +1,13 @@
+# ======== Required ===========
+
+# Or set REDIS_ADDRESS environment variable
+redisAddress: ""
+
+# Or set RETHINKDB_ADDRESS environment variable
+rethinkdbAddress: ""
+
+# ======== Optional ===========
+
+# taskTimeout: 30s
+# dockerHost: "unix:///var/run/docker.sock"
+# dockerCertPath: "$HOME/.boot2docker/certs/boot2docker-vm"
