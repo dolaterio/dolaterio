@@ -65,7 +65,9 @@ func (runner *JobRunner) Start() {
 				if err != nil {
 					runner.Errors <- err
 				} else {
-					runner.jobs <- job
+					if job != nil {
+						runner.jobs <- job
+					}
 				}
 			} else {
 				cont = false
