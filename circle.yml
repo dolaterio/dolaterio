@@ -12,10 +12,9 @@ test:
 
 dependencies:
   pre:
+    - docker run -d -p 28015:28015 rethinkdb:2.0
     - docker pull dolaterio/dummy-worker
     - docker pull busybox
     - docker pull ubuntu:14.04
-    - docker run -d -p 28015:28015 rethinkdb:2.0
-    - sleep 10
     - make dep-install
     - cp config_base.yml config.yml
