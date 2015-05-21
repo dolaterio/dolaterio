@@ -26,6 +26,12 @@ func NewConnection() (*Connection, error) {
 		return nil, err
 	}
 
+	_, err = gorethink.Wait().Run(s)
+
+	if err != nil {
+		return nil, err
+	}
+
 	connection := &Connection{
 		s: s,
 	}
