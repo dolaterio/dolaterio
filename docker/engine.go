@@ -3,6 +3,7 @@ package docker
 import (
 	"time"
 
+	"github.com/dolaterio/dolaterio/core"
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/fsouza/go-dockerclient"
 )
@@ -14,20 +15,18 @@ type Engine struct {
 }
 
 // NewEngine initiates and returns a new docker engine.
-func NewEngine(config *EngineConfig) (*Engine, error) {
-	config.defaults()
-
+func NewEngine() (*Engine, error) {
 	var c *docker.Client
 	var err error
 
-	if config.CertPath == "" {
-		c, err = docker.NewClient(config.Host)
+	if core.Config.DockerCertPath == "" {
+		c, err = docker.NewClient(core.Config.DockerHost)
 	} else {
 		c, err = docker.NewTLSClient(
-			config.Host,
-			config.CertPath+"/cert.pem",
-			config.CertPath+"/key.pem",
-			config.CertPath+"/ca.pem")
+			core.Config.DockerHost,
+			core.Config.DockerCertPath+"/cert.pem",
+			core.Config.DockerCertPath+"/key.pem",
+			core.Config.DockerCertPath+"/ca.pem")
 	}
 	if err != nil {
 		return nil, err
@@ -35,7 +34,7 @@ func NewEngine(config *EngineConfig) (*Engine, error) {
 
 	return &Engine{
 		client:  c,
-		Timeout: config.Timeout,
+		Timeout: core.Config.TaskTimeout,
 	}, nil
 }
 

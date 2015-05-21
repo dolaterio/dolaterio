@@ -14,7 +14,7 @@ var (
 
 func setup() {
 	dbConnection, _ = db.NewConnection()
-	engine, _ = docker.NewEngine(&docker.EngineConfig{})
+	engine, _ = docker.NewEngine()
 	q = newFakeQueue()
 }
 

@@ -29,7 +29,7 @@ func main() {
 		log.Fatal("Failure to connect to the queue: ", err)
 	}
 
-	engine, err := docker.NewEngine(&docker.EngineConfig{})
+	engine, err := docker.NewEngine()
 	if err != nil {
 		log.Fatal("Failure to connect to docker: ", err)
 	}
