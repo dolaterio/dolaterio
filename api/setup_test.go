@@ -18,9 +18,20 @@ var (
 )
 
 func setup() {
-	engine, _ = docker.NewEngine()
-	q, _ = queue.NewRedisQueue()
-	dbConn, _ = db.NewConnection()
+	var err error
+
+	engine, err = docker.NewEngine()
+	if err != nil {
+		panic(err)
+	}
+	q, err = queue.NewRedisQueue()
+	if err != nil {
+		panic(err)
+	}
+	dbConn, err = db.NewConnection()
+	if err != nil {
+		panic(err)
+	}
 
 	api := &apiHandler{
 		dbConnection: dbConn,

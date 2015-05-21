@@ -13,8 +13,15 @@ var (
 )
 
 func setup() {
-	dbConnection, _ = db.NewConnection()
-	engine, _ = docker.NewEngine()
+	var err error
+	dbConnection, err = db.NewConnection()
+	if err != nil {
+		panic(err)
+	}
+	engine, err = docker.NewEngine()
+	if err != nil {
+		panic(err)
+	}
 	q = newFakeQueue()
 }
 
