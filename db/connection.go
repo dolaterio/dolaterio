@@ -16,10 +16,9 @@ type Connection struct {
 func NewConnection() (*Connection, error) {
 	// Open a session to the DB
 	s, err := gorethink.Connect(gorethink.ConnectOpts{
-		Address:  core.Config.RethinkDbAddress,
-		Database: "dolaterio",
-		MaxIdle:  10,
-		MaxOpen:  10,
+		Address: core.Config.RethinkDbAddress,
+		MaxIdle: 10,
+		MaxOpen: 10,
 	})
 
 	if err != nil {
@@ -57,6 +56,11 @@ func NewConnection() (*Connection, error) {
 
 	connection.db = gorethink.Db("dolaterio")
 
+	_, err = connection.db.Wait().Run(s)
+	if err != nil {
+		return nil, err
+	}
+
 	// Get tables (and create if missing)
 	q, err = connection.db.TableList().Run(s)
 	if err != nil {
@@ -72,6 +76,10 @@ func NewConnection() (*Connection, error) {
 		}
 	}
 	connection.jobsTable = connection.db.Table("jobs")
+	_, err = connection.jobsTable.Wait().Run(s)
+	if err != nil {
+		return nil, err
+	}
 
 	return connection, nil
 }
