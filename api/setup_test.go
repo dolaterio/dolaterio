@@ -28,6 +28,10 @@ func setup() {
 	if err != nil {
 		panic(err)
 	}
+	err = q.Empty()
+	if err != nil {
+		panic(err)
+	}
 	dbConn, err = db.NewConnection()
 	if err != nil {
 		panic(err)
