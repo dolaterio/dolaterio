@@ -1,6 +1,8 @@
 package queue
 
 import (
+	"fmt"
+
 	"github.com/dolaterio/dolaterio/core"
 
 	"gopkg.in/redis.v2"
@@ -15,7 +17,8 @@ type redisQueue struct {
 func NewRedisQueue() (Queue, error) {
 	client := redis.NewClient(&redis.Options{
 		Network: "tcp",
-		Addr:    core.Config.RedisAddress,
+		Addr: fmt.Sprintf(
+			"%v:%v", core.Config.RedisIp, core.Config.RedisPort),
 	})
 
 	cmd := client.Ping()

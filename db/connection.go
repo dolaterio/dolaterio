@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/dancannon/gorethink"
 	"github.com/dolaterio/dolaterio/core"
 )
@@ -17,7 +19,8 @@ type Connection struct {
 func NewConnection() (*Connection, error) {
 	// Open a session to the DB
 	s, err := gorethink.Connect(gorethink.ConnectOpts{
-		Address: core.Config.RethinkDbAddress,
+		Address: fmt.Sprintf(
+			"%v:%v", core.Config.RethinkDbIp, core.Config.RethinkDbPort),
 		MaxIdle: 20,
 		MaxOpen: 20,
 	})

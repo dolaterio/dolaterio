@@ -8,11 +8,13 @@ import (
 
 // ConfigStore is the storage for the configuration singleton
 type ConfigStore struct {
-	RedisAddress     string
-	RethinkDbAddress string
-	DockerHost       string
-	DockerCertPath   string
-	TaskTimeout      time.Duration
+	RedisIp        string
+	RedisPort      string
+	RethinkDbIp    string
+	RethinkDbPort  string
+	DockerHost     string
+	DockerCertPath string
+	TaskTimeout    time.Duration
 }
 
 var (
@@ -21,9 +23,13 @@ var (
 )
 
 func init() {
-	viper.BindEnv("redisAddress", "REDIS_ADDRESS")
+	viper.BindEnv("redisIp", "REDIS_IP")
+	viper.BindEnv("redisPort", "REDIS_PORT")
+	viper.SetDefault("redisPort", "6380")
 
-	viper.BindEnv("rethinkdbAddress", "RETHINKDB_ADDRESS")
+	viper.BindEnv("rethinkdbIp", "RETHINKDB_IP")
+	viper.BindEnv("rethinkdbPort", "RETHINKDB_PORT")
+	viper.SetDefault("rethinkdbPort", "28015")
 
 	viper.BindEnv("dockerHost", "DOCKER_HOST")
 	viper.SetDefault("dockerHost", "unix:///var/run/docker.sock")
@@ -36,16 +42,19 @@ func init() {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath("../")
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)
 	}
 
 	Config = ConfigStore{
-		RedisAddress:     viper.GetString("redisAddress"),
-		RethinkDbAddress: viper.GetString("rethinkdbAddress"),
-		DockerHost:       viper.GetString("dockerHost"),
-		DockerCertPath:   viper.GetString("dockerCertPath"),
-		TaskTimeout:      viper.GetDuration("taskTimeout"),
+		RedisIp:        viper.GetString("redisIp"),
+		RedisPort:      viper.GetString("redisPort"),
+		RethinkDbIp:    viper.GetString("rethinkdbIp"),
+		RethinkDbPort:  viper.GetString("rethinkdbPort"),
+		DockerHost:     viper.GetString("dockerHost"),
+		DockerCertPath: viper.GetString("dockerCertPath"),
+		TaskTimeout:    viper.GetDuration("taskTimeout"),
 	}
 }
