@@ -7,9 +7,10 @@ import (
 
 // Connection represents a connection to the database
 type Connection struct {
-	s         *gorethink.Session
-	db        gorethink.Term
-	jobsTable gorethink.Term
+	s            *gorethink.Session
+	db           gorethink.Term
+	jobsTable    gorethink.Term
+	workersTable gorethink.Term
 }
 
 // NewConnection initializes and returns a DB connection ready to use
@@ -17,8 +18,8 @@ func NewConnection() (*Connection, error) {
 	// Open a session to the DB
 	s, err := gorethink.Connect(gorethink.ConnectOpts{
 		Address: core.Config.RethinkDbAddress,
-		MaxIdle: 10,
-		MaxOpen: 10,
+		MaxIdle: 20,
+		MaxOpen: 20,
 	})
 
 	if err != nil {
@@ -77,6 +78,18 @@ func NewConnection() (*Connection, error) {
 	}
 	connection.jobsTable = connection.db.Table("jobs")
 	_, err = connection.jobsTable.Wait().Run(s)
+	if err != nil {
+		return nil, err
+	}
+
+	if !arrContainsString(tables, "workers") {
+		_, err = connection.db.TableCreate("workers").RunWrite(s)
+		if err != nil {
+			return nil, err
+		}
+	}
+	connection.workersTable = connection.db.Table("workers")
+	_, err = connection.workersTable.Wait().Run(s)
 	if err != nil {
 		return nil, err
 	}

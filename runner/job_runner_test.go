@@ -14,10 +14,15 @@ func TestSimpleProcess(t *testing.T) {
 	defer clean()
 
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"echo", "hello world"},
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"echo", "hello world"},
+		},
 	}
-	err := job.Store(dbConnection)
+	err := job.Worker.Store(dbConnection)
+	assert.Nil(t, err)
+	job.WorkerID = job.Worker.ID
+	err = job.Store(dbConnection)
 	assert.Nil(t, err)
 
 	runner := NewJobRunner(&JobRunnerOptions{
@@ -54,9 +59,13 @@ func TestParallelProcess(t *testing.T) {
 	jobs := make([]*db.Job, 5)
 	for i := 0; i < 5; i++ {
 		jobs[i] = &db.Job{
-			DockerImage: "ubuntu:14.04",
-			Cmd:         []string{"sleep", "1"},
+			Worker: &db.Worker{
+				DockerImage: "ubuntu:14.04",
+				Cmd:         []string{"sleep", "1"},
+			},
 		}
+		jobs[i].Worker.Store(dbConnection)
+		jobs[i].WorkerID = jobs[i].Worker.ID
 		jobs[i].Store(dbConnection)
 		q.Enqueue(&queue.Message{JobID: jobs[i].ID})
 	}
@@ -82,10 +91,15 @@ func TestEngineTimeout(t *testing.T) {
 	engine.Timeout = 1 * time.Second
 
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"sleep", "10"},
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"sleep", "10"},
+		},
 	}
-	err := job.Store(dbConnection)
+	err := job.Worker.Store(dbConnection)
+	assert.Nil(t, err)
+	job.WorkerID = job.Worker.ID
+	err = job.Store(dbConnection)
 	assert.Nil(t, err)
 
 	runner := NewJobRunner(&JobRunnerOptions{
@@ -114,11 +128,16 @@ func TestJobTimeout(t *testing.T) {
 	defer clean()
 
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"sleep", "10"},
-		Timeout:     1 * time.Second,
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"sleep", "10"},
+			Timeout:     1 * time.Second,
+		},
 	}
-	err := job.Store(dbConnection)
+	err := job.Worker.Store(dbConnection)
+	assert.Nil(t, err)
+	job.WorkerID = job.Worker.ID
+	err = job.Store(dbConnection)
 	assert.Nil(t, err)
 
 	runner := NewJobRunner(&JobRunnerOptions{

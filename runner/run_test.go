@@ -14,8 +14,10 @@ func TestRunEcho(t *testing.T) {
 	defer clean()
 
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"echo", "hello world"},
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"echo", "hello world"},
+		},
 	}
 	engine, err := docker.NewEngine()
 	assert.Nil(t, err)
@@ -30,9 +32,11 @@ func TestRunEnv(t *testing.T) {
 	setup()
 	defer clean()
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"env"},
-		Env:         map[string]string{"K1": "V1", "K2": "V2"},
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"env"},
+		},
+		Env: map[string]string{"K1": "V1", "K2": "V2"},
 	}
 	engine, err := docker.NewEngine()
 	assert.Nil(t, err)
@@ -47,9 +51,12 @@ func TestRunStdin(t *testing.T) {
 	setup()
 	defer clean()
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"cat"},
-		Stdin:       "hello world\n",
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"cat"},
+		},
+
+		Stdin: "hello world\n",
 	}
 	engine, err := docker.NewEngine()
 	assert.Nil(t, err)
@@ -63,8 +70,10 @@ func TestRunStderr(t *testing.T) {
 	setup()
 	defer clean()
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"bash", "-c", "echo hello world >&2"},
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"bash", "-c", "echo hello world >&2"},
+		},
 	}
 	engine, err := docker.NewEngine()
 	assert.Nil(t, err)
@@ -78,9 +87,11 @@ func TestRunTimeout(t *testing.T) {
 	setup()
 	defer clean()
 	job := &db.Job{
-		DockerImage: "ubuntu:14.04",
-		Cmd:         []string{"sleep", "2000"},
-		Timeout:     1 * time.Millisecond,
+		Worker: &db.Worker{
+			DockerImage: "ubuntu:14.04",
+			Cmd:         []string{"sleep", "2000"},
+			Timeout:     1 * time.Millisecond,
+		},
 	}
 	engine, err := docker.NewEngine()
 	assert.Nil(t, err)

@@ -36,7 +36,7 @@ func Run(job *db.Job, engine *docker.Engine) error {
 		}
 	}()
 
-	timeout := job.Timeout
+	timeout := job.Worker.Timeout
 	if timeout == 0 {
 		timeout = engine.Timeout
 	}

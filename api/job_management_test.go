@@ -1,88 +1,75 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
+	"fmt"
 	"testing"
-	"time"
 
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/stretchr/testify/assert"
 )
 
-func createJob(t *testing.T, body string) *db.Job {
-	req, _ := http.NewRequest("POST", "/v1/jobs", bytes.NewBufferString(body))
-
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
-
-	decoder := json.NewDecoder(w.Body)
-	var job db.Job
-	decoder.Decode(&job)
-	return &job
-}
-
-func fetchJob(t *testing.T, id string) *db.Job {
-	attempts := 50
-
-	for attempts > 0 {
-		var job db.Job
-
-		req, err := http.NewRequest("GET", "/v1/jobs/"+id, nil)
-		assert.Nil(t, err)
-
-		w := httptest.NewRecorder()
-		handler.ServeHTTP(w, req)
-		decoder := json.NewDecoder(w.Body)
-		decoder.Decode(&job)
-
-		if job.Status == db.StatusFinished {
-			return &job
-		}
-
-		time.Sleep(100 * time.Millisecond)
-		attempts--
-	}
-	t.Fatal("The job has not completed")
-	return nil
-}
-
 func TestCreateAndFetchJob(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker"}`)
+	worker := createWorker(t, `{"docker_image":"dolaterio/dummy-worker"}`)
+	job := createJob(t, fmt.Sprintf(`{"worker_id": "%v"}`, worker.ID))
 	job = fetchJob(t, job.ID)
 	assert.Equal(t, db.StatusFinished, job.Status)
+	assert.Empty(t, job.Syserr)
 }
 
 func TestCreateAndFetchJobWithStdin(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","stdin":"hello world"}`)
+	worker := createWorker(t, `{"docker_image":"dolaterio/dummy-worker"}`)
+	job := createJob(t, fmt.Sprintf(`{"worker_id": "%v","stdin":"hello world"}`, worker.ID))
 	job = fetchJob(t, job.ID)
 
+	assert.Empty(t, job.Syserr)
 	assert.Contains(t, job.Stdout, "hello world")
 }
 
-func TestCreateAndFetchJobWithEnvVars(t *testing.T) {
+func TestCreateAndFetchJobWithJobEnvVars(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","env":{"HELLO":"world"}}`)
+	worker := createWorker(t, `{"docker_image":"dolaterio/dummy-worker"}`)
+	job := createJob(t, fmt.Sprintf(`{"worker_id": "%v","env":{"HELLO":"world"}}`, worker.ID))
 	job = fetchJob(t, job.ID)
+	assert.Empty(t, job.Syserr)
 	assert.Contains(t, job.Stdout, "HELLO: 'world'")
 }
 
-func TestCreateAndFetchJobWithTimeout(t *testing.T) {
+func TestCreateAndFetchJobWithWorkerEnvVars(t *testing.T) {
 	setup()
 	defer clean()
 
-	job := createJob(t, `{"docker_image":"dolaterio/dummy-worker","timeout":10}`)
+	worker := createWorker(t, `{"docker_image":"dolaterio/dummy-worker","env":{"HELLO":"world"}}`)
+	job := createJob(t, fmt.Sprintf(`{"worker_id": "%v"}`, worker.ID))
 	job = fetchJob(t, job.ID)
+	assert.Empty(t, job.Syserr)
+	assert.Contains(t, job.Stdout, "HELLO: 'world'")
+}
 
+func TestCreateAndFetchJobWithBothEnvVars(t *testing.T) {
+	setup()
+	defer clean()
+
+	worker := createWorker(t, `{"docker_image":"dolaterio/dummy-worker","env":{"HELLO":"no"}}`)
+	job := createJob(t, fmt.Sprintf(`{"worker_id": "%v","env":{"HELLO":"world"}}`, worker.ID))
+	job = fetchJob(t, job.ID)
+	assert.Empty(t, job.Syserr)
+	assert.Contains(t, job.Stdout, "HELLO: 'world'")
+}
+
+func TestCreateAndFetchJobWithWorkerTimeout(t *testing.T) {
+	setup()
+	defer clean()
+
+	worker := createWorker(t, `{"docker_image":"dolaterio/dummy-worker","timeout":10}`)
+	job := createJob(t, fmt.Sprintf(`{"worker_id": "%v"}`, worker.ID))
+	job = fetchJob(t, job.ID)
 	assert.Equal(t, "timeout", job.Syserr)
 }
