@@ -48,21 +48,33 @@ func (engine *Engine) BuildContainer(job *db.Job) (*Container, error) {
 	//  return nil, err
 	// }
 
-	envVars := make([]string, len(job.Env))
+	mergedVars := map[string]string{}
+	if job.Worker.Env != nil {
+		for k, v := range job.Worker.Env {
+			mergedVars[k] = v
+		}
+	}
+	if job.Env != nil {
+		for k, v := range job.Env {
+			mergedVars[k] = v
+		}
+	}
+
+	envVars := make([]string, len(mergedVars))
 	idx := 0
-	for k, v := range job.Env {
+	for k, v := range mergedVars {
 		envVars[idx] = k + "=" + v
 		idx++
 	}
 	c, err := engine.client.CreateContainer(docker.CreateContainerOptions{
 		Config: &docker.Config{
-			Image:      job.DockerImage,
+			Image:      job.Worker.DockerImage,
 			Env:        envVars,
 			Memory:     128 * 1024 * 1024, // 128 MB
 			MemorySwap: 0,
 			StdinOnce:  true,
 			OpenStdin:  true,
-			Cmd:        job.Cmd,
+			Cmd:        job.Worker.Cmd,
 		},
 	})
 	if err != nil {

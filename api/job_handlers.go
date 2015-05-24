@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/dolaterio/dolaterio/queue"
@@ -12,10 +11,9 @@ import (
 )
 
 type jobObjectRequest struct {
-	DockerImage string            `json:"docker_image"`
-	Stdin       string            `json:"stdin"`
-	Timeout     int               `json:"timeout"`
-	Env         map[string]string `json:"env"`
+	WorkerID string            `json:"worker_id"`
+	Stdin    string            `json:"stdin"`
+	Env      map[string]string `json:"env"`
 }
 
 func (api *apiHandler) jobsCreateHandler(res http.ResponseWriter, req *http.Request) {
@@ -24,11 +22,9 @@ func (api *apiHandler) jobsCreateHandler(res http.ResponseWriter, req *http.Requ
 	decoder.Decode(&jobReq)
 
 	job := &db.Job{
-		DockerImage: jobReq.DockerImage,
-		Stdin:       jobReq.Stdin,
-		Env:         jobReq.Env,
-		Timeout:     time.Duration(jobReq.Timeout) * time.Millisecond,
-		Status:      "pending",
+		Stdin:    jobReq.Stdin,
+		WorkerID: jobReq.WorkerID,
+		Env:      jobReq.Env,
 	}
 	err := job.Store(api.dbConnection)
 	api.q.Enqueue(&queue.Message{
@@ -50,12 +46,10 @@ func (api *apiHandler) jobsIndexHandler(res http.ResponseWriter, req *http.Reque
 		renderError(res, err, 500)
 		return
 	}
-
 	if job == nil {
 		renderError(res, errors.New("Job not found"), 404)
 		return
 	}
-
 	api.renderJob(res, job)
 }
 

@@ -1,19 +1,16 @@
 package db
 
-import "time"
-
 // Job is the model struct for jobs
 type Job struct {
-	ID          string            `gorethink:"id,omitempty" json:"id"`
-	Status      string            `gorethink:"status" json:"status"`
-	DockerImage string            `gorethink:"docker_image" json:"docker_image"`
-	Cmd         []string          `gorethink:"cmd" json:"cmd"`
-	Env         map[string]string `gorethink:"env" json:"env"`
-	Stdin       string            `gorethink:"stdin" json:"stdin"`
-	Stdout      string            `gorethink:"stdout" json:"stdout"`
-	Stderr      string            `gorethink:"stderr" json:"stderr"`
-	Timeout     time.Duration     `gorethink:"timeout,omitempty" json:"timeout"`
-	Syserr      string            `gorethink:"syserr" json:"syserr"`
+	ID       string            `gorethink:"id,omitempty" json:"id"`
+	Worker   *Worker           `gorethink:"-" json:"-"`
+	WorkerID string            `gorethink:"worker_id" json:"worker_id"`
+	Status   string            `gorethink:"status" json:"status"`
+	Env      map[string]string `gorethink:"env" json:"env"`
+	Stdin    string            `gorethink:"stdin" json:"stdin"`
+	Stdout   string            `gorethink:"stdout" json:"stdout"`
+	Stderr   string            `gorethink:"stderr" json:"stderr"`
+	Syserr   string            `gorethink:"syserr" json:"syserr"`
 }
 
 const (
@@ -25,6 +22,7 @@ const (
 // GetJob returns a job from the db
 func GetJob(c *Connection, id string) (*Job, error) {
 	res, err := c.jobsTable.Get(id).Run(c.s)
+	defer res.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +31,10 @@ func GetJob(c *Connection, id string) (*Job, error) {
 	}
 	var job Job
 	err = res.One(&job)
+	if err != nil {
+		return nil, err
+	}
+	job.Worker, err = GetWorker(c, job.WorkerID)
 	if err != nil {
 		return nil, err
 	}
