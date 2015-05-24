@@ -3,14 +3,14 @@ test:
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -a -o dolater ./api && \
-	docker build -t dolaterio/dolaterio . &&
+	docker build -t dolaterio/dolaterio . && \
 	rm dolater
 
 run:
 	docker run \
 		-it \
 		--rm \
-		--link dolaterio-rethinkdb:rethinkdb\
+		--link dolaterio-rethinkdb:rethinkdb \
 		--link dolaterio-redis:redis \
 		-e "BINDING=0.0.0.0" \
 		-p 7000:7000 \
