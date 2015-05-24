@@ -8,6 +8,8 @@ import (
 
 // ConfigStore is the storage for the configuration singleton
 type ConfigStore struct {
+	Binding        string
+	Port           string
 	RedisIP        string
 	RedisPort      string
 	RethinkDbIP    string
@@ -23,6 +25,12 @@ var (
 )
 
 func init() {
+	viper.BindEnv("binding", "BINDING")
+	viper.SetDefault("binding", "127.0.0.1")
+
+	viper.BindEnv("port", "PORT")
+	viper.SetDefault("port", "8080")
+
 	viper.BindEnv("redisIp", "REDIS_IP")
 	viper.BindEnv("rethinkdbIp", "REDIS_PORT_6379_TCP_ADDR")
 
@@ -55,6 +63,8 @@ func init() {
 	}
 
 	Config = ConfigStore{
+		Binding:        viper.GetString("binding"),
+		Port:           viper.GetString("port"),
 		RedisIP:        viper.GetString("redisIp"),
 		RedisPort:      viper.GetString("redisPort"),
 		RethinkDbIP:    viper.GetString("rethinkdbIp"),

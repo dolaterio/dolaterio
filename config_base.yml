@@ -8,12 +8,29 @@ rethinkdbIp: ""
 
 # ======== Optional ===========
 
+# Binding IP
+# Can be set as env vars: BINDING
+# binding: "127.0.0.1"
+
+# Port where the http server will listen
+# Can be set as env vars: PORT
+# port: "8080"
+
+# Default timeout used when creating tasks.
 # taskTimeout: 30s
+
+# Host to connect to docker. Can be the path to the unix socket.
+# Can be set as env vars: DOCKER_HOST
 # dockerHost: "unix:///var/run/docker.sock"
+
+# Path to the folder with your docker certificates
+# Can be set as env vars: DOCKER_CERT_PATH
 # dockerCertPath: "$HOME/.boot2docker/certs/boot2docker-vm"
 
-# Also REDIS_PORT or REDIS_PORT_6379_TCP_PORT
+# Port of your redis instance.
+# Can be set as env vars: REDIS_PORT, REDIS_PORT_6379_TCP_PORT
 # redisPort: ""
 
-# Also RETHINKDB_PORT or RETHINKDB_PORT_28015_TCP_PORT
+# Port of your rethinkdb instance
+# Can be set as env vars: RETHINKDB_PORT, RETHINKDB_PORT_28015_TCP_PORT
 # rethinkdbPort: ""
