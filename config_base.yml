@@ -1,9 +1,9 @@
 # ======== Required ===========
 
-# Or set REDIS_IP environment variable
+# Or set REDIS_IP or REDIS_PORT_6379_TCP_ADDR environment variable
 redisIp: ""
 
-# Or set RETHINKDB_IP environment variable
+# Or set RETHINKDB_IP or RETHINKDB_PORT_28015_TCP_ADDR environment variable
 rethinkdbIp: ""
 
 # ======== Optional ===========
@@ -12,8 +12,8 @@ rethinkdbIp: ""
 # dockerHost: "unix:///var/run/docker.sock"
 # dockerCertPath: "$HOME/.boot2docker/certs/boot2docker-vm"
 
-# Also REDIS_PORT
+# Also REDIS_PORT or REDIS_PORT_6379_TCP_PORT
 # redisPort: ""
 
-# Also RETHINKDB_PORT
+# Also RETHINKDB_PORT or RETHINKDB_PORT_28015_TCP_PORT
 # rethinkdbPort: ""

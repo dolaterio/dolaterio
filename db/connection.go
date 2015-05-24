@@ -20,7 +20,7 @@ func NewConnection() (*Connection, error) {
 	// Open a session to the DB
 	s, err := gorethink.Connect(gorethink.ConnectOpts{
 		Address: fmt.Sprintf(
-			"%v:%v", core.Config.RethinkDbIp, core.Config.RethinkDbPort),
+			"%v:%v", core.Config.RethinkDbIP, core.Config.RethinkDbPort),
 		MaxIdle: 20,
 		MaxOpen: 20,
 	})

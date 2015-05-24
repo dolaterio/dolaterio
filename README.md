@@ -20,6 +20,16 @@ docker run \
   rethinkdb:2.0
 ```
 
+Do the same with redis, another dependency:
+```
+docker run \
+  --restart always \
+  -d \
+  -p 6380:6379 \
+  --name dolaterio-redis \
+  redis:2.8
+```
+
 Then, run dolater.io:
 
 ```
@@ -28,15 +38,21 @@ docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -p 8080:8080 \
   --link dolaterio-rethinkdb:rethinkdb \
+  --link dolaterio-redis:redis \
   dolaterio/dolaterio \
-  bash -c "\
-    RETHINKDB_ADDRESS="\$RETHINKDB_PORT_28015_TCP_ADDR:\$RETHINKDB_PORT_28015_TCP_PORT" /gopath/bin/dolaterio --bind 0.0.0.0\
-  "
+  /gopath/bin/dolaterio --bind 0.0.0.0
 ```
 
-Now, ready to queue a job! Send the following request to your instance:
+Now create a worker using our parrot docker image:
+
 ```
-curl http://DOCKERHOST:8080/v1/jobs -H "Content-Type: application/json" -X POST -d '{"docker_image": "dolaterio/parrot", "stdin": "Hello world!"}'
+curl http://DOCKERHOST:8080/v1/workers -H "Content-Type: application/json" -X POST -d '{"docker_image": "dolaterio/parrot"}'
+```
+
+You'll get the worker json back in the response of that request. Use its `id` to create jobs:
+
+```
+curl http://DOCKERHOST:8080/v1/jobs -H "Content-Type: application/json" -X POST -d '{"worker_id": WORKER_ID, "stdin": "Hello world!"}'
 ```
 
 It will return a new JSON containing an `id`. You can request dolater.io for the current state of the job:

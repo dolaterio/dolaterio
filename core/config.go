@@ -8,9 +8,9 @@ import (
 
 // ConfigStore is the storage for the configuration singleton
 type ConfigStore struct {
-	RedisIp        string
+	RedisIP        string
 	RedisPort      string
-	RethinkDbIp    string
+	RethinkDbIP    string
 	RethinkDbPort  string
 	DockerHost     string
 	DockerCertPath string
@@ -24,11 +24,17 @@ var (
 
 func init() {
 	viper.BindEnv("redisIp", "REDIS_IP")
+	viper.BindEnv("rethinkdbIp", "REDIS_PORT_6379_TCP_ADDR")
+
 	viper.BindEnv("redisPort", "REDIS_PORT")
-	viper.SetDefault("redisPort", "6380")
+	viper.BindEnv("rethinkdbIp", "REDIS_PORT_6379_TCP_PORT")
+	viper.SetDefault("redisPort", "6379")
 
 	viper.BindEnv("rethinkdbIp", "RETHINKDB_IP")
+	viper.BindEnv("rethinkdbIp", "RETHINKDB_PORT_28015_TCP_ADDR")
+
 	viper.BindEnv("rethinkdbPort", "RETHINKDB_PORT")
+	viper.BindEnv("rethinkdbPort", "RETHINKDB_PORT_28015_TCP_PORT")
 	viper.SetDefault("rethinkdbPort", "28015")
 
 	viper.BindEnv("dockerHost", "DOCKER_HOST")
@@ -49,9 +55,9 @@ func init() {
 	}
 
 	Config = ConfigStore{
-		RedisIp:        viper.GetString("redisIp"),
+		RedisIP:        viper.GetString("redisIp"),
 		RedisPort:      viper.GetString("redisPort"),
-		RethinkDbIp:    viper.GetString("rethinkdbIp"),
+		RethinkDbIP:    viper.GetString("rethinkdbIp"),
 		RethinkDbPort:  viper.GetString("rethinkdbPort"),
 		DockerHost:     viper.GetString("dockerHost"),
 		DockerCertPath: viper.GetString("dockerCertPath"),

@@ -18,7 +18,7 @@ func NewRedisQueue() (Queue, error) {
 	client := redis.NewClient(&redis.Options{
 		Network: "tcp",
 		Addr: fmt.Sprintf(
-			"%v:%v", core.Config.RedisIp, core.Config.RedisPort),
+			"%v:%v", core.Config.RedisIP, core.Config.RedisPort),
 	})
 
 	cmd := client.Ping()
