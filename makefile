@@ -1,6 +1,13 @@
 test:
 	godep go test -v ./...
 
+build:
+	CGO_ENABLED=0 GOOS=linux go build -a -o dolater ./api && \
+	docker build -t dolaterio/dolaterio .
+
+run:
+	docker run -it --rm -v /Users/albert/workspace/gocode/src/github.com/dolaterio/dolaterio/config.yml dolaterio/dolaterio
+
 dep-install:
 	go get github.com/tools/godep && GOPATH=$$(godep path) godep restore
 

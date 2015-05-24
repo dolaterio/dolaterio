@@ -31,17 +31,13 @@ func init() {
 	viper.BindEnv("port", "PORT")
 	viper.SetDefault("port", "8080")
 
-	viper.BindEnv("redisIp", "REDIS_IP")
-	viper.BindEnv("rethinkdbIp", "REDIS_PORT_6379_TCP_ADDR")
+	viper.BindEnv("redisIp", "REDIS_PORT_6379_TCP_ADDR")
 
-	viper.BindEnv("redisPort", "REDIS_PORT")
-	viper.BindEnv("rethinkdbIp", "REDIS_PORT_6379_TCP_PORT")
+	viper.BindEnv("redisPort", "REDIS_PORT_6379_TCP_PORT")
 	viper.SetDefault("redisPort", "6379")
 
-	viper.BindEnv("rethinkdbIp", "RETHINKDB_IP")
 	viper.BindEnv("rethinkdbIp", "RETHINKDB_PORT_28015_TCP_ADDR")
 
-	viper.BindEnv("rethinkdbPort", "RETHINKDB_PORT")
 	viper.BindEnv("rethinkdbPort", "RETHINKDB_PORT_28015_TCP_PORT")
 	viper.SetDefault("rethinkdbPort", "28015")
 
@@ -55,6 +51,7 @@ func init() {
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
+	viper.AddConfigPath("./")
 	viper.AddConfigPath("../")
 
 	err := viper.ReadInConfig()

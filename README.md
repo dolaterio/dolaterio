@@ -37,10 +37,10 @@ docker run \
   -d \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -p 8080:8080 \
+  -e "BINDING=0.0.0.0" \
   --link dolaterio-rethinkdb:rethinkdb \
   --link dolaterio-redis:redis \
-  dolaterio/dolaterio \
-  /gopath/bin/dolaterio --bind 0.0.0.0
+  dolaterio/dolaterio
 ```
 
 Now create a worker using our parrot docker image:

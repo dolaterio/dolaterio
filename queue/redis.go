@@ -3,9 +3,9 @@ package queue
 import (
 	"fmt"
 
-	"github.com/dolaterio/dolaterio/core"
-
 	"gopkg.in/redis.v2"
+
+	"github.com/dolaterio/dolaterio/core"
 )
 
 type redisQueue struct {

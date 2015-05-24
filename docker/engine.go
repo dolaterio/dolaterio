@@ -3,12 +3,12 @@ package docker
 import (
 	"time"
 
+	// Engine is the engine to process jobs on docker
 	"github.com/dolaterio/dolaterio/core"
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/fsouza/go-dockerclient"
 )
 
-// Engine is the engine to process jobs on docker
 type Engine struct {
 	Timeout time.Duration
 	client  *docker.Client

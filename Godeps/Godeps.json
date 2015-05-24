@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/dolaterio/dolaterio",
-	"GoVersion": "go1.4",
+	"GoVersion": "devel +ca9128f Wed Apr 22 16:28:57 2015 +0000",
 	"Packages": [
 		"./..."
 	],
@@ -116,7 +116,7 @@
 		},
 		{
 			"ImportPath": "github.com/spf13/viper",
-			"Rev": "0d75ecea1c8c20a98fe8def0b7a3ad7f515029b8"
+			"Rev": "d62d4bb4c68a773c3b5f4e72844913a2d5de0de0"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",

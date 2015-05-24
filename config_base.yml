@@ -1,12 +1,16 @@
-# ======== Required ===========
+# Or set REDIS_PORT_6379_TCP_ADDR environment variable
+# redisIp: ""
 
-# Or set REDIS_IP or REDIS_PORT_6379_TCP_ADDR environment variable
-redisIp: ""
+# Port of your redis instance.
+# Can be set as env vars: REDIS_PORT_6379_TCP_PORT
+# redisPort: ""
 
-# Or set RETHINKDB_IP or RETHINKDB_PORT_28015_TCP_ADDR environment variable
-rethinkdbIp: ""
+# Or set RETHINKDB_PORT_28015_TCP_ADDR environment variable
+# rethinkdbIp: ""
 
-# ======== Optional ===========
+# Port of your rethinkdb instance
+# Can be set as env vars: RETHINKDB_PORT_28015_TCP_PORT
+# rethinkdbPort: ""
 
 # Binding IP
 # Can be set as env vars: BINDING
@@ -26,11 +30,3 @@ rethinkdbIp: ""
 # Path to the folder with your docker certificates
 # Can be set as env vars: DOCKER_CERT_PATH
 # dockerCertPath: "$HOME/.boot2docker/certs/boot2docker-vm"
-
-# Port of your redis instance.
-# Can be set as env vars: REDIS_PORT, REDIS_PORT_6379_TCP_PORT
-# redisPort: ""
-
-# Port of your rethinkdb instance
-# Can be set as env vars: RETHINKDB_PORT, RETHINKDB_PORT_28015_TCP_PORT
-# rethinkdbPort: ""
