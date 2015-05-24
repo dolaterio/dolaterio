@@ -18,7 +18,7 @@
 
 # Port where the http server will listen
 # Can be set as env vars: PORT
-# port: "8080"
+# port: "7000"
 
 # Default timeout used when creating tasks.
 # taskTimeout: 30s

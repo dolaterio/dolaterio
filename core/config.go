@@ -29,7 +29,7 @@ func init() {
 	viper.SetDefault("binding", "127.0.0.1")
 
 	viper.BindEnv("port", "PORT")
-	viper.SetDefault("port", "8080")
+	viper.SetDefault("port", "7000")
 
 	viper.BindEnv("redisIp", "REDIS_PORT_6379_TCP_ADDR")
 

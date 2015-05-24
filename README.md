@@ -36,8 +36,9 @@ Then, run dolater.io:
 docker run \
   -d \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -p 8080:8080 \
+  -p 7000:7000 \
   -e "BINDING=0.0.0.0" \
+  -e "PORT=7000" \
   --link dolaterio-rethinkdb:rethinkdb \
   --link dolaterio-redis:redis \
   dolaterio/dolaterio
@@ -46,17 +47,17 @@ docker run \
 Now create a worker using our parrot docker image:
 
 ```
-curl http://DOCKERHOST:8080/v1/workers -H "Content-Type: application/json" -X POST -d '{"docker_image": "dolaterio/parrot"}'
+curl http://DOCKERHOST:7000/v1/workers -H "Content-Type: application/json" -X POST -d '{"docker_image": "dolaterio/parrot"}'
 ```
 
 You'll get the worker json back in the response of that request. Use its `id` to create jobs:
 
 ```
-curl http://DOCKERHOST:8080/v1/jobs -H "Content-Type: application/json" -X POST -d '{"worker_id": WORKER_ID, "stdin": "Hello world!"}'
+curl http://DOCKERHOST:7000/v1/jobs -H "Content-Type: application/json" -X POST -d '{"worker_id": WORKER_ID, "stdin": "Hello world!"}'
 ```
 
 It will return a new JSON containing an `id`. You can request dolater.io for the current state of the job:
 
 ```
-curl http://DOCKERHOST:8080/v1/jobs/ID
+curl http://DOCKERHOST:7000/v1/jobs/ID
 ```
