@@ -95,7 +95,7 @@ func createWorker(t *testing.T, body string) *db.Worker {
 }
 
 func fetchJob(t *testing.T, id string) *db.Job {
-	attempts := 10
+	attempts := 100
 
 	for attempts > 0 {
 		var job db.Job
@@ -112,7 +112,7 @@ func fetchJob(t *testing.T, id string) *db.Job {
 			return &job
 		}
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 		attempts--
 	}
 	t.Fatal("The job has not completed")
