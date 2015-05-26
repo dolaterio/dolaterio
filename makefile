@@ -1,8 +1,8 @@
-migrate_db:
-	godep go run ./migrate/main.go
-
 test: migrate_db
 	godep go test -v ./...
+
+migrate_db:
+	godep go run ./migrate/main.go
 
 dolater.bin:
 	CGO_ENABLED=0 GOOS=linux go build -a -o dolater.bin ./api
