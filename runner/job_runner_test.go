@@ -120,7 +120,7 @@ func TestEngineTimeout(t *testing.T) {
 	job, err = db.GetJob(dbConnection, job.ID)
 	assert.NotEmpty(t, job.Syserr)
 
-	assert.WithinDuration(t, time.Now(), begin, 4*time.Second)
+	assert.WithinDuration(t, time.Now(), begin, 9*time.Second)
 }
 
 func TestJobTimeout(t *testing.T) {
@@ -158,5 +158,5 @@ func TestJobTimeout(t *testing.T) {
 	job, err = db.GetJob(dbConnection, job.ID)
 	assert.NotEmpty(t, job.Syserr)
 
-	assert.WithinDuration(t, time.Now(), begin, 4*time.Second)
+	assert.WithinDuration(t, time.Now(), begin, 9*time.Second)
 }
