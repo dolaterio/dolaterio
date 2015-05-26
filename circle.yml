@@ -3,10 +3,10 @@ machine:
     - docker
     - redis
   environment:
-    RETHINKDB_IP: localhost
-    RETHINKDB_PORT: 28015
-    REDIS_IP: localhost
-    REDIS_PORT: 6379
+    REDIS_PORT_6379_TCP_ADDR: localhost
+    REDIS_PORT_6379_TCP_PORT: 6379
+    RETHINKDB_PORT_28015_TCP_ADDR: localhost
+    RETHINKDB_PORT_28015_TCP_PORT: 28015
 
 test:
   override:
