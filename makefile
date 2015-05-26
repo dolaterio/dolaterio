@@ -1,10 +1,35 @@
-test:
+migrate_db:
+	godep go run ./migrate/main.go
+
+test: migrate_db
 	godep go test -v ./...
 
-build:
-	CGO_ENABLED=0 GOOS=linux go build -a -o dolater ./api && \
-	docker build -t dolaterio/dolaterio . && \
-	rm dolater
+dolater.bin:
+	CGO_ENABLED=0 GOOS=linux go build -a -o dolater.bin ./api
+migrate.bin:
+	CGO_ENABLED=0 GOOS=linux go build -a -o migrate.bin ./api
+clean:
+	if [ -a dolater.bin ] ; \
+	then \
+	     rm dolater.bin ; \
+	fi; \
+	if [ -a migrate.bin ] ; \
+	then \
+	     rm migrate.bin ; \
+	fi;
+build: clean dolater.bin migrate.bin
+	docker build -t dolaterio/dolaterio .
+
+run_migrate:
+	docker run \
+		-it \
+		--rm \
+		--link dolaterio-rethinkdb:rethinkdb \
+		--link dolaterio-redis:redis \
+		-e "BINDING=0.0.0.0" \
+		-p 7000:7000 \
+		dolaterio/dolaterio
+		/migrate
 
 run:
 	docker run \
