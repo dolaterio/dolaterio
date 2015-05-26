@@ -12,6 +12,9 @@
 # Can be set as env vars: RETHINKDB_PORT_28015_TCP_PORT
 # rethinkdbPort: ""
 
+# Database name used in rethinkDb
+# rethinkdbDatabase: "dolaterio"
+
 # Binding IP
 # Can be set as env vars: BINDING
 # binding: "127.0.0.1"
