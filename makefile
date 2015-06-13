@@ -4,20 +4,26 @@ test: migrate_db
 migrate_db:
 	godep go run ./migrate/main.go
 
-dolater.bin:
-	CGO_ENABLED=0 GOOS=linux go build -a -o dolater.bin ./api
+api.bin:
+	CGO_ENABLED=0 GOOS=linux go build -a -o api.bin ./api
+worker.bin:
+	CGO_ENABLED=0 GOOS=linux go build -a -o worker.bin ./worker
 migrate.bin:
 	CGO_ENABLED=0 GOOS=linux go build -a -o migrate.bin ./api
 clean:
-	if [ -a dolater.bin ] ; \
+	if [ -a api.bin ] ; \
 	then \
-	     rm dolater.bin ; \
+	     rm api.bin ; \
 	fi; \
 	if [ -a migrate.bin ] ; \
 	then \
 	     rm migrate.bin ; \
 	fi;
-build: clean dolater.bin migrate.bin
+	if [ -a worker.bin ] ; \
+	then \
+	     rm worker.bin ; \
+	fi;
+build: clean api.bin migrate.bin worker.bin
 	docker build -t dolaterio/dolaterio .
 
 run_migrate:
@@ -31,14 +37,23 @@ run_migrate:
 		dolaterio/dolaterio
 		/migrate
 
-run:
+run_api:
 	docker run \
-		-it \
 		--rm \
+		-d \
 		--link dolaterio-rethinkdb:rethinkdb \
 		--link dolaterio-redis:redis \
 		-e "BINDING=0.0.0.0" \
 		-p 7000:7000 \
+		dolaterio/dolaterio \
+		/api
+
+run_worker:
+	docker run \
+		--rm \
+		-d \
+		--link dolaterio-rethinkdb:rethinkdb \
+		--link dolaterio-redis:redis \
 		dolaterio/dolaterio
 
 dep-install:
