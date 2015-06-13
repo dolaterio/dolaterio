@@ -23,7 +23,7 @@ docker run \
     --rm \
     --link dolaterio-rethinkdb:rethinkdb \
     --link dolaterio-redis:redis \
-    dolaterio/dolaterio
+    dolaterio/dolaterio \
     /migrate
 ```
 

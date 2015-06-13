@@ -9,7 +9,7 @@ api.bin:
 worker.bin:
 	CGO_ENABLED=0 GOOS=linux go build -a -o worker.bin ./worker
 migrate.bin:
-	CGO_ENABLED=0 GOOS=linux go build -a -o migrate.bin ./api
+	CGO_ENABLED=0 GOOS=linux go build -a -o migrate.bin ./migrate
 clean:
 	if [ -a api.bin ] ; \
 	then \
