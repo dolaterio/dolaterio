@@ -1,0 +1,25 @@
+worker:
+  image: dolaterio/dolaterio
+  links:
+    - "redis"
+    - "rethinkdb"
+  command: /worker
+  volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock"
+
+api:
+  image: dolaterio/dolaterio
+  links:
+    - "redis"
+    - "rethinkdb"
+  command: /api
+  ports:
+    - "7000:7000"
+  environment:
+    - BINDING=0.0.0.0
+
+redis:
+  image: redis:2.8
+
+rethinkdb:
+  image: rethinkdb:2.0

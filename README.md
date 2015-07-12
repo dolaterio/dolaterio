@@ -4,60 +4,36 @@
 
 Dolater.io lets you execute background jobs on a remote docker server.
 
-# Quick start
+# How to run it
 
-Dolater.io runs your jobs as docker images. Check out our example docker images like [dolaterio/dummy_worker](https://github.com/dolaterio/dummy_worker), [dolaterio/asciify](https://github.com/dolaterio/asciify) or [dolaterio/parrot](https://github.com/dolaterio/parrot).
-
-Run rethinkdb, it's a dependency for dolater.io:
-```
-docker run \
-  --restart always \
-  -d \
-  -p 8080:8080 \
-  -p 28015:28015 \
-  -p 29015:29015 \
-  --name dolaterio-rethinkdb \
-  rethinkdb:2.0
-```
-
-Do the same with redis, another dependency:
-```
-docker run \
-  --restart always \
-  -d \
-  -p 6380:6379 \
-  --name dolaterio-redis \
-  redis:2.8
-```
-
-Then, run dolater.io:
+You'll need [docker-compose](https://docs.docker.com/compose/) to run the services and its dependencies easily. To run all services at once use, run:
 
 ```
-docker run \
-  -d \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -p 7000:7000 \
-  -e "BINDING=0.0.0.0" \
-  -e "PORT=7000" \
-  --link dolaterio-rethinkdb:rethinkdb \
-  --link dolaterio-redis:redis \
-  dolaterio/dolaterio
+docker-compose up -d --no-recreate
 ```
 
-Now create a worker using our parrot docker image:
+This will run the API server as well as one dolater.io worker. You can always scale the amount of workers by using `docker-compose scale worker=N` command.
+
+Now it's all ready to use.
+
+# Simple Example
+
+Since dolater.io is running in docker, you'll need to know your docker host IP address to access it. If you use boot2docker, run `boot2docker ip` to find out.
+
+Create a worker using our parrot docker image:
 
 ```
 curl http://DOCKERHOST:7000/v1/workers -H "Content-Type: application/json" -X POST -d '{"docker_image": "dolaterio/parrot"}'
 ```
 
-You'll get the worker json back in the response of that request. Use its `id` to create jobs:
+You'll get a JSON response back with the information of the worker you just created. Use its `id` to create jobs on it:
 
 ```
 curl http://DOCKERHOST:7000/v1/jobs -H "Content-Type: application/json" -X POST -d '{"worker_id": WORKER_ID, "stdin": "Hello world!"}'
 ```
 
-It will return a new JSON containing an `id`. You can request dolater.io for the current state of the job:
+It will return a new JSON containing, between others, the `id` of the job. You can request dolater.io for the current state of the job:
 
 ```
-curl http://DOCKERHOST:7000/v1/jobs/ID
+curl http://DOCKERHOST:7000/v1/jobs/JOB_ID
 ```
