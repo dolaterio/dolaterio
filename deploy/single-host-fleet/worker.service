@@ -1,0 +1,21 @@
+[Unit]
+Description=Dolater.io Worker service
+After=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill worker
+ExecStartPre=-/usr/bin/docker rm worker
+ExecStartPre=/usr/bin/docker pull dolaterio/dolaterio:latest
+
+ExecStart=/bin/sh -c '/usr/bin/docker run --name worker        \
+    -e REDIS_PORT_6379_TCP_ADDR="${COREOS_PRIVATE_IPV4}"       \
+    -e RETHINKDB_PORT_28015_TCP_ADDR="${COREOS_PRIVATE_IPV4}"  \
+    -v /var/run/docker.sock:/var/run/docker.sock  \
+    dolaterio/dolaterio:latest /worker'
+
+ExecStop=/usr/bin/docker stop worker
+
+[X-Fleet]
+X-Conflicts=worker.service

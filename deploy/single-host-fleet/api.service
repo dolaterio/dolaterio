@@ -1,0 +1,22 @@
+[Unit]
+Description=Dolater.io API service
+After=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill api
+ExecStartPre=-/usr/bin/docker rm api
+ExecStartPre=/usr/bin/docker pull dolaterio/dolaterio:latest
+
+ExecStart=/bin/sh -c '/usr/bin/docker run --name api           \
+    -p 80:7000                                                 \
+    -e BINDING=0.0.0.0                                         \
+    -e REDIS_PORT_6379_TCP_ADDR="${COREOS_PRIVATE_IPV4}"       \
+    -e RETHINKDB_PORT_28015_TCP_ADDR="${COREOS_PRIVATE_IPV4}"  \
+    dolaterio/dolaterio:latest /api'
+
+ExecStop=/usr/bin/docker stop api
+
+[X-Fleet]
+X-Conflicts=api.service

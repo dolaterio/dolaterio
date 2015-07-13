@@ -1,0 +1,10 @@
+[Unit]
+Description=Announce Redis service
+
+[Service]
+EnvironmentFile=/etc/environment
+ExecStart=/bin/sh -c "while true; do etcdctl set /announce/services/redis ${COREOS_PRIVATE_IPV4} --ttl 60; sleep 45; done"
+ExecStop=/usr/bin/etcdctl rm /announce/services/redis
+
+[X-Fleet]
+X-Conflicts=redis-discovery.service

@@ -1,0 +1,21 @@
+[Unit]
+Description=Redis service
+After=docker.service
+BindsTo=redis-discovery.service
+
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill redis
+ExecStartPre=-/usr/bin/docker rm redis
+ExecStartPre=-/usr/bin/mkdir -p /data/redis
+ExecStartPre=/usr/bin/docker pull redis:2.8
+ExecStart=/bin/sh -c '/usr/bin/docker run --name redis  \
+    -p ${COREOS_PRIVATE_IPV4}:6379:6379                 \
+    -v /data/redis/:/data/                              \
+    redis:2.8'
+
+ExecStop=/usr/bin/docker stop redis
+
+[X-Fleet]
+X-ConditionMachineOf=redis-discovery.service
