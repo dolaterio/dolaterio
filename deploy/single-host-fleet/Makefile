@@ -1,29 +1,29 @@
 st:
-	fleetctl --endpoint FLEET_HOST list-units
+	fleetctl list-units
 
 run_redis:
-	fleetctl --endpoint FLEET_HOST start redis-discovery.service
-	fleetctl --endpoint FLEET_HOST start redis.service
+	fleetctl start redis-discovery.service
+	fleetctl start redis.service
 destroy_redis:
-	fleetctl --endpoint FLEET_HOST destroy redis-discovery.service
-	fleetctl --endpoint FLEET_HOST destroy redis.service
+	fleetctl destroy redis-discovery.service
+	fleetctl destroy redis.service
 
 run_rethinkdb:
-	fleetctl --endpoint FLEET_HOST start rethinkdb-discovery.service
-	fleetctl --endpoint FLEET_HOST start rethinkdb.service
+	fleetctl start rethinkdb-discovery.service
+	fleetctl start rethinkdb.service
 
 destroy_rethinkdb:
-	fleetctl --endpoint FLEET_HOST destroy rethinkdb-discovery.service
-	fleetctl --endpoint FLEET_HOST destroy rethinkdb.service
+	fleetctl destroy rethinkdb-discovery.service
+	fleetctl destroy rethinkdb.service
 
 run_api:
-	fleetctl --endpoint FLEET_HOST start api.service
+	fleetctl start api.service
 
 destroy_api:
-	fleetctl --endpoint FLEET_HOST destroy api.service
+	fleetctl destroy api.service
 
 run_worker:
-	fleetctl --endpoint FLEET_HOST start worker.service
+	fleetctl start worker.service
 
 destroy_worker:
-	fleetctl --endpoint FLEET_HOST destroy worker.service
+	fleetctl destroy worker.service

@@ -1,6 +1,8 @@
 test: migrate_db
 	godep go test -v ./...
 
+run:
+	docker-compose up -d --no-recreate
 run_api:
 	docker-compose up -d --no-recreate api
 run_worker:
