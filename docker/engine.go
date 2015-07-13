@@ -41,12 +41,12 @@ func NewEngine() (*Engine, error) {
 // BuildContainer builds a Container to process the current request
 func (engine *Engine) BuildContainer(job *db.Job) (*Container, error) {
 	var err error
-	// err = engine.client.PullImage(docker.PullImageOptions{
-	//  Repository: job.Image,
-	// }, docker.AuthConfiguration{})
-	// if err != nil {
-	//  return nil, err
-	// }
+	err = engine.client.PullImage(docker.PullImageOptions{
+		Repository: job.Worker.DockerImage,
+	}, docker.AuthConfiguration{})
+	if err != nil {
+		return nil, err
+	}
 
 	mergedVars := map[string]string{}
 	if job.Worker.Env != nil {

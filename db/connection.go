@@ -19,6 +19,7 @@ type Connection struct {
 func NewConnection() (*Connection, error) {
 	// Open a session to the DB
 	s, err := gorethink.Connect(gorethink.ConnectOpts{
+		Database: core.Config.RethinkDbDatabase,
 		Address: fmt.Sprintf(
 			"%v:%v", core.Config.RethinkDbIP, core.Config.RethinkDbPort),
 		MaxIdle: 20,

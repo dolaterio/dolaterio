@@ -9,6 +9,7 @@ import (
 
 func main() {
 	s, err := gorethink.Connect(gorethink.ConnectOpts{
+		Database: core.Config.RethinkDbDatabase,
 		Address: fmt.Sprintf(
 			"%v:%v", core.Config.RethinkDbIP, core.Config.RethinkDbPort),
 	})
@@ -16,12 +17,6 @@ func main() {
 		panic(err)
 	}
 	defer s.Close()
-
-	cur, err := gorethink.Wait().Run(s)
-	if err != nil {
-		panic(err)
-	}
-	defer cur.Close()
 
 	err = createDb(s)
 	if err != nil {
