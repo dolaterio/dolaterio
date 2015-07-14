@@ -34,7 +34,7 @@ func (api *apiHandler) jobsCreateHandler(res http.ResponseWriter, req *http.Requ
 		renderError(res, err, 500)
 		return
 	}
-
+	res.WriteHeader(201)
 	api.renderJob(res, job)
 }
 
@@ -50,6 +50,7 @@ func (api *apiHandler) jobsIndexHandler(res http.ResponseWriter, req *http.Reque
 		renderError(res, errors.New("Job not found"), 404)
 		return
 	}
+	res.WriteHeader(200)
 	api.renderJob(res, job)
 }
 

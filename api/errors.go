@@ -7,13 +7,19 @@ import (
 
 type errResponse struct {
 	Error   bool   `json:"error"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
 func renderError(res http.ResponseWriter, err error, code int) {
+	renderErrorMessage(res, err.Error(), code)
+}
+
+func renderErrorMessage(res http.ResponseWriter, message string, code int) {
 	errRes := &errResponse{
 		Error:   true,
-		Message: err.Error(),
+		Code:    code,
+		Message: message,
 	}
 	res.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(res)

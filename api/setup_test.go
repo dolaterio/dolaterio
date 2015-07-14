@@ -70,7 +70,7 @@ func clean() {
 	jobRunner.Stop()
 }
 
-func createJob(t *testing.T, body string) *db.Job {
+func createJob(t *testing.T, body string) (*db.Job, *httptest.ResponseRecorder) {
 	req, _ := http.NewRequest("POST", "/v1/jobs", bytes.NewBufferString(body))
 
 	w := httptest.NewRecorder()
@@ -79,10 +79,10 @@ func createJob(t *testing.T, body string) *db.Job {
 	decoder := json.NewDecoder(w.Body)
 	var job db.Job
 	decoder.Decode(&job)
-	return &job
+	return &job, w
 }
 
-func createWorker(t *testing.T, body string) *db.Worker {
+func createWorker(t *testing.T, body string) (*db.Worker, *httptest.ResponseRecorder) {
 	req, _ := http.NewRequest("POST", "/v1/workers", bytes.NewBufferString(body))
 
 	w := httptest.NewRecorder()
@@ -91,7 +91,7 @@ func createWorker(t *testing.T, body string) *db.Worker {
 	decoder := json.NewDecoder(w.Body)
 	var worker db.Worker
 	decoder.Decode(&worker)
-	return &worker
+	return &worker, w
 }
 
 func fetchJob(t *testing.T, id string) *db.Job {

@@ -38,6 +38,15 @@ func NewEngine() (*Engine, error) {
 	}, nil
 }
 
+// ValidImage builds a Container to process the current request
+func (engine *Engine) ValidImage(imageName string) (bool, error) {
+	images, err := engine.client.SearchImages(imageName)
+	if err != nil {
+		return false, err
+	}
+	return len(images) > 0, nil
+}
+
 // BuildContainer builds a Container to process the current request
 func (engine *Engine) BuildContainer(job *db.Job) (*Container, error) {
 	var err error

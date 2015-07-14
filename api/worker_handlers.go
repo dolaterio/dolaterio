@@ -21,17 +21,29 @@ func (api *apiHandler) workersCreateHandler(res http.ResponseWriter, req *http.R
 	var workerReq workerObjectRequest
 	decoder.Decode(&workerReq)
 
-	worker := &db.Worker{
-		DockerImage: workerReq.DockerImage,
-		Env:         workerReq.Env,
-		Timeout:     time.Duration(workerReq.Timeout) * time.Millisecond,
-	}
-	err := worker.Store(api.dbConnection)
+	valid, err := api.engine.ValidImage(workerReq.DockerImage)
 	if err != nil {
 		renderError(res, err, 500)
 		return
 	}
 
+	if !valid {
+		renderErrorMessage(res, "Invalid docker image", 412)
+		return
+	}
+
+	worker := &db.Worker{
+		DockerImage: workerReq.DockerImage,
+		Env:         workerReq.Env,
+		Timeout:     time.Duration(workerReq.Timeout) * time.Millisecond,
+	}
+	err = worker.Store(api.dbConnection)
+	if err != nil {
+		renderError(res, err, 500)
+		return
+	}
+
+	res.WriteHeader(201)
 	api.renderWorker(res, worker)
 }
 
@@ -49,6 +61,7 @@ func (api *apiHandler) workersIndexHandler(res http.ResponseWriter, req *http.Re
 		return
 	}
 
+	res.WriteHeader(200)
 	api.renderWorker(res, worker)
 }
 
