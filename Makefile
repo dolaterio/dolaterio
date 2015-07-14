@@ -1,4 +1,4 @@
-test: migrate_db
+test: dev_migrate_db
 	godep go test -v ./...
 
 run:
