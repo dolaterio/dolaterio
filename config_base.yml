@@ -2,34 +2,39 @@
 # redisIp: ""
 
 # Port of your redis instance.
-# Can be set as env vars: REDIS_PORT_6379_TCP_PORT
-# redisPort: ""
+# Can be set as an environment variable: REDIS_PORT_6379_TCP_PORT
+# redisPort: "6379"
 
 # Or set RETHINKDB_PORT_28015_TCP_ADDR environment variable
 # rethinkdbIp: ""
 
 # Port of your rethinkdb instance
-# Can be set as env vars: RETHINKDB_PORT_28015_TCP_PORT
-# rethinkdbPort: ""
+# Can be set as an environment variable: RETHINKDB_PORT_28015_TCP_PORT
+# rethinkdbPort: "28015"
 
 # Database name used in rethinkDb
 # rethinkdbDatabase: "dolaterio"
 
 # Binding IP
-# Can be set as env vars: BINDING
+# Can be set as an environment variable: BINDING
 # binding: "127.0.0.1"
 
 # Port where the http server will listen
-# Can be set as env vars: PORT
+# Can be set as an environment variable: PORT
 # port: "7000"
 
 # Default timeout used when creating tasks.
 # taskTimeout: 30s
 
 # Host to connect to docker. Can be the path to the unix socket.
-# Can be set as env vars: DOCKER_HOST
+# Can be set as an environment variable: DOCKER_HOST
 # dockerHost: "unix:///var/run/docker.sock"
 
 # Path to the folder with your docker certificates
-# Can be set as env vars: DOCKER_CERT_PATH
+# Can be set as an environment variable: DOCKER_CERT_PATH
 # dockerCertPath: "$HOME/.boot2docker/certs/boot2docker-vm"
+
+# Logging level.
+# Valid values: debug, info, warn, error, fatal, panic
+# Can be set as an environment variable: LOG_LEVEL
+# logLevel: warn

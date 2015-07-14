@@ -3,6 +3,7 @@ package core
 import (
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -52,6 +53,9 @@ func init() {
 
 	viper.SetDefault("taskTimeout", 30*time.Second)
 
+	viper.BindEnv("logLevel", "LOG_LEVEL")
+	viper.SetDefault("logLevel", "warn")
+
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./")
@@ -61,6 +65,12 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
+	level, err := logrus.ParseLevel(viper.GetString("logLevel"))
+	if err != nil {
+		panic(err)
+	}
+	logrus.SetLevel(level)
 
 	Config = ConfigStore{
 		Binding:           viper.GetString("binding"),
