@@ -12,69 +12,25 @@
 		},
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.7.3",
-			"Rev": "55eb11d21d2a31a3cc93838241d04800f52e823d"
-		},
-		{
-			"ImportPath": "github.com/armon/consul-api",
-			"Rev": "dcfedd50ed5334f96adee43fc88518a4f095e15c"
+			"Comment": "v0.8.3-3-g07d998d",
+			"Rev": "07d998d174c4e2dc90e2f1989a20724220bca1ff"
 		},
 		{
 			"ImportPath": "github.com/cenkalti/backoff",
-			"Rev": "9831e1e25c874e0a0601b6dc43641071414eec7a"
-		},
-		{
-			"ImportPath": "github.com/coreos/go-etcd/etcd",
-			"Comment": "v2.0.0-7-g73a8ef7",
-			"Rev": "73a8ef737e8ea002281a28b4cb92a1de121ad4c6"
+			"Rev": "6c45d6bc1e78d94431dff8fc28a99f20bafa355a"
 		},
 		{
 			"ImportPath": "github.com/dancannon/gorethink",
-			"Comment": "v0.7.1",
-			"Rev": "0fcd578dc17224eb4812abb34a472f6b72d9c62f"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/archive",
-			"Comment": "v1.4.1-2827-g17d5450",
-			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/fileutils",
-			"Comment": "v1.4.1-2827-g17d5450",
-			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/ioutils",
-			"Comment": "v1.4.1-2827-g17d5450",
-			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/pools",
-			"Comment": "v1.4.1-2827-g17d5450",
-			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/promise",
-			"Comment": "v1.4.1-2827-g17d5450",
-			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/system",
-			"Comment": "v1.4.1-2827-g17d5450",
-			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/vendor/src/code.google.com/p/go/src/pkg/archive/tar",
-			"Comment": "v1.4.1-2827-g17d5450",
-			"Rev": "17d5450bc31e81c22e8ccba806294e4d744af275"
+			"Comment": "v1.x.x",
+			"Rev": "8aca6ba2cc6e873299617d730fac0d7f6593113a"
 		},
 		{
 			"ImportPath": "github.com/fsouza/go-dockerclient",
-			"Rev": "4a43f0ee9fe0c8f6cb7672b41b11122b40bb531a"
+			"Rev": "83f21d43c86447d7682430bba5c9731b68af9ee6"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
-			"Rev": "655cdfa588ea190e901bc5590e65d5621688847c"
+			"Rev": "ab974be44dc3b7b8a1fb306fb32fe9b9f3864b3d"
 		},
 		{
 			"ImportPath": "github.com/gorilla/context",
@@ -82,7 +38,7 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/mux",
-			"Rev": "8096f47503459bcc74d1f4c487b7e6e42e5746b5"
+			"Rev": "9cb89f07ca03c6a28d1e237ba033bc6a29422fd6"
 		},
 		{
 			"ImportPath": "github.com/kr/pretty",
@@ -95,12 +51,12 @@
 		},
 		{
 			"ImportPath": "github.com/magiconair/properties",
-			"Comment": "v1.5.2",
-			"Rev": "d5929c67198951106f49f7ea425198d0f1a08f7f"
+			"Comment": "v1.5.4",
+			"Rev": "359442d561ca28acd0fe503aa9f075f505bc9ed0"
 		},
 		{
 			"ImportPath": "github.com/mitchellh/mapstructure",
-			"Rev": "f7d28d5aeab42b9b95d2e6d6b956f73a290077fc"
+			"Rev": "2caf8efc93669b6c43e0441cdc6aed17546c96f3"
 		},
 		{
 			"ImportPath": "github.com/spf13/cast",
@@ -112,38 +68,16 @@
 		},
 		{
 			"ImportPath": "github.com/spf13/pflag",
-			"Rev": "b91b2a94780f4e6b4d3b0c12fd9b5f4b05b1aa45"
+			"Rev": "67cbc198fd11dab704b214c1e629a97af392c085"
 		},
 		{
 			"ImportPath": "github.com/spf13/viper",
-			"Rev": "d62d4bb4c68a773c3b5f4e72844913a2d5de0de0"
+			"Rev": "db7ff930a189b98d602179d9001d33345f42b8c7"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "e22aedd37671fb115be6c0c25129c405cb575cfd"
-		},
-		{
-			"ImportPath": "github.com/xordataexchange/crypt/backend",
-			"Comment": "v0.0.2-15-g93de656",
-			"Rev": "93de65664ef094aa5acff4f5201ac17580370af7"
-		},
-		{
-			"ImportPath": "github.com/xordataexchange/crypt/config",
-			"Comment": "v0.0.2-15-g93de656",
-			"Rev": "93de65664ef094aa5acff4f5201ac17580370af7"
-		},
-		{
-			"ImportPath": "github.com/xordataexchange/crypt/encoding/secconf",
-			"Comment": "v0.0.2-15-g93de656",
-			"Rev": "93de65664ef094aa5acff4f5201ac17580370af7"
-		},
-		{
-			"ImportPath": "golang.org/x/crypto/cast5",
-			"Rev": "5c68cfdf2a545b5ff576c075b459d1fc0c606f82"
-		},
-		{
-			"ImportPath": "golang.org/x/crypto/openpgp",
-			"Rev": "5c68cfdf2a545b5ff576c075b459d1fc0c606f82"
+			"Comment": "v1.0-17-g089c718",
+			"Rev": "089c7181b8c728499929ff09b62d3fdd8df8adff"
 		},
 		{
 			"ImportPath": "gopkg.in/bufio.v1",
@@ -157,7 +91,7 @@
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "49c95bdc21843256fb6c4e0d370a05f24a0bf213"
+			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
 		}
 	]
 }
