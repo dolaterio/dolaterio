@@ -35,7 +35,7 @@ func main() {
 }
 
 func createDb(s *gorethink.Session) error {
-	cur, err := gorethink.DbList().Run(s)
+	cur, err := gorethink.DBList().Run(s)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func createDb(s *gorethink.Session) error {
 	cur.All(&databases)
 
 	if !arrContainsString(databases, core.Config.RethinkDbDatabase) {
-		_, err = gorethink.DbCreate(core.Config.RethinkDbDatabase).RunWrite(s)
+		_, err = gorethink.DBCreate(core.Config.RethinkDbDatabase).RunWrite(s)
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func createDb(s *gorethink.Session) error {
 }
 
 func createTable(s *gorethink.Session, tableName string) error {
-	cur, err := gorethink.Db(core.Config.RethinkDbDatabase).
+	cur, err := gorethink.DB(core.Config.RethinkDbDatabase).
 		TableList().Run(s)
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func createTable(s *gorethink.Session, tableName string) error {
 	cur.All(&tables)
 
 	if !arrContainsString(tables, tableName) {
-		_, err = gorethink.Db(core.Config.RethinkDbDatabase).
+		_, err = gorethink.DB(core.Config.RethinkDbDatabase).
 			TableCreate(tableName).RunWrite(s)
 		if err != nil {
 			return err

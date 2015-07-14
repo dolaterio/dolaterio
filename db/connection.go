@@ -37,7 +37,7 @@ func NewConnection() (*Connection, error) {
 		return nil, err
 	}
 
-	db := gorethink.Db(core.Config.RethinkDbDatabase)
+	db := gorethink.DB(core.Config.RethinkDbDatabase)
 
 	connection := &Connection{
 		s:            s,
