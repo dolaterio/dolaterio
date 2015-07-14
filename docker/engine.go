@@ -10,8 +10,9 @@ import (
 )
 
 type Engine struct {
-	Timeout time.Duration
-	client  *docker.Client
+	Timeout  time.Duration
+	SkipPull bool
+	client   *docker.Client
 }
 
 // NewEngine initiates and returns a new docker engine.
@@ -50,11 +51,13 @@ func (engine *Engine) ValidImage(imageName string) (bool, error) {
 // BuildContainer builds a Container to process the current request
 func (engine *Engine) BuildContainer(job *db.Job) (*Container, error) {
 	var err error
-	err = engine.client.PullImage(docker.PullImageOptions{
-		Repository: job.Worker.DockerImage,
-	}, docker.AuthConfiguration{})
-	if err != nil {
-		return nil, err
+	if !engine.SkipPull {
+		err = engine.client.PullImage(docker.PullImageOptions{
+			Repository: job.Worker.DockerImage,
+		}, docker.AuthConfiguration{})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	mergedVars := map[string]string{}

@@ -22,6 +22,7 @@ func setup() {
 	if err != nil {
 		panic(err)
 	}
+	engine.SkipPull = true
 	q = newFakeQueue()
 }
 
