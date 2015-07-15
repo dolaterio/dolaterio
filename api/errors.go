@@ -21,6 +21,7 @@ func renderErrorMessage(res http.ResponseWriter, message string, code int) {
 		Code:    code,
 		Message: message,
 	}
+	log.WithField("error_response", errRes).Error("Sent error response")
 	res.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(res)
 	res.WriteHeader(code)

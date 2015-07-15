@@ -42,7 +42,7 @@ func main() {
 		dbConnection: dbConnection,
 	}
 
-	http.Handle("/", handler.rootHandler())
+	http.Handle("/", loggingHandler(handler.rootHandler()))
 	address := fmt.Sprintf("%v:%v", core.Config.Binding, core.Config.Port)
 
 	log.WithField("address", address).Info("Serving dolater.io api")
