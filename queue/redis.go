@@ -5,6 +5,7 @@ import (
 
 	"gopkg.in/redis.v2"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/dolaterio/dolaterio/core"
 )
 
@@ -12,6 +13,12 @@ type redisQueue struct {
 	client   *redis.Client
 	queueKey string
 }
+
+var (
+	log = logrus.WithFields(logrus.Fields{
+		"package": "queue",
+	})
+)
 
 // NewRedisQueue returns a redis-backed queue
 func NewRedisQueue() (Queue, error) {
@@ -41,16 +48,23 @@ func (q *redisQueue) Empty() error {
 }
 
 func (q *redisQueue) Enqueue(message *Message) error {
+	log.WithField("jobID", message.JobID).Info("Queuing message")
 	cmd := q.client.RPush(q.queueKey, message.JobID)
 	if cmd.Err() != nil {
+		log.WithField("jobID", message.JobID).
+			WithField("err", cmd.Err()).
+			Error("Error queuing message")
 		return cmd.Err()
 	}
 	return nil
 }
 
 func (q *redisQueue) Dequeue() (*Message, error) {
+	log.Info("Dequeuing message")
 	cmd := q.client.BLPop(0, q.queueKey)
 	if cmd.Err() != nil {
+		log.WithField("err", cmd.Err()).
+			Error("Error dequeuing message")
 		return nil, cmd.Err()
 	}
 
