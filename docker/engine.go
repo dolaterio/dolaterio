@@ -3,12 +3,13 @@ package docker
 import (
 	"time"
 
-	// Engine is the engine to process jobs on docker
+	"github.com/Sirupsen/logrus"
 	"github.com/dolaterio/dolaterio/core"
 	"github.com/dolaterio/dolaterio/db"
 	"github.com/fsouza/go-dockerclient"
 )
 
+// Engine is the engine to process jobs on docker
 type Engine struct {
 	Timeout  time.Duration
 	SkipPull bool
@@ -41,21 +42,33 @@ func NewEngine() (*Engine, error) {
 
 // ValidImage builds a Container to process the current request
 func (engine *Engine) ValidImage(imageName string) (bool, error) {
+	log.WithField("image", imageName).Info("Validating docker image")
 	images, err := engine.client.SearchImages(imageName)
 	if err != nil {
+		log.WithFields(logrus.Fields{"image": imageName, "err": err}).
+			Error("Error validating image")
 		return false, err
 	}
+	log.WithFields(logrus.Fields{"image": imageName, "found": len(images)}).
+		Debug("Images found")
 	return len(images) > 0, nil
 }
 
 // BuildContainer builds a Container to process the current request
 func (engine *Engine) BuildContainer(job *db.Job) (*Container, error) {
+	logFields := logrus.Fields{"jobID": job.ID}
 	var err error
+
+	log.WithFields(logFields).Info("Building container")
+
 	if !engine.SkipPull {
+		log.WithFields(logFields).Info("Pulling docker image")
 		err = engine.client.PullImage(docker.PullImageOptions{
 			Repository: job.Worker.DockerImage,
 		}, docker.AuthConfiguration{})
 		if err != nil {
+			log.WithFields(logFields).WithField("err", err).
+				Error("Error fetching image")
 			return nil, err
 		}
 	}
@@ -90,11 +103,15 @@ func (engine *Engine) BuildContainer(job *db.Job) (*Container, error) {
 		},
 	})
 	if err != nil {
+		log.WithFields(logFields).WithField("err", err).
+			Error("Error creating the container")
 		return nil, err
 	}
 
 	err = engine.client.StartContainer(c.ID, nil)
 	if err != nil {
+		log.WithFields(logFields).WithField("err", err).
+			Error("Error starting the container")
 		return nil, err
 	}
 

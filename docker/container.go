@@ -18,6 +18,7 @@ type Container struct {
 
 // AttachStdin sends the StdIn to the container
 func (container *Container) AttachStdin() error {
+	log.WithField("containerID", container.containerID).Info("Attaching STDIN")
 	if container.StdIn == nil {
 		return nil
 	}
@@ -31,12 +32,16 @@ func (container *Container) AttachStdin() error {
 
 // Wait waits for the docker container to be done (or timeout in 30s)
 func (container *Container) Wait() error {
+	log.WithField("containerID", container.containerID).
+		Info("Waiting for the container to finish")
 	_, err := container.engine.client.WaitContainer(container.containerID)
 	return err
 }
 
 // FetchOutput retrieves the outputs from the container
 func (container *Container) FetchOutput() error {
+	log.WithField("containerID", container.containerID).
+		Info("Fetching container STDOUT")
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
 
@@ -49,6 +54,9 @@ func (container *Container) FetchOutput() error {
 		Tail:         "all",
 	})
 	if err != nil {
+		log.WithField("containerID", container.containerID).
+			WithField("err", err).
+			Error("Error getting the logs")
 		return err
 	}
 	container.StdOut = stdout.Bytes()
@@ -58,6 +66,8 @@ func (container *Container) FetchOutput() error {
 
 // Remove removes the container from the docker host
 func (container *Container) Remove() error {
+	log.WithField("containerID", container.containerID).
+		Info("Removing Container")
 	return container.engine.client.RemoveContainer(docker.RemoveContainerOptions{
 		ID:    container.containerID,
 		Force: true,
