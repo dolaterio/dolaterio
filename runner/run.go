@@ -14,6 +14,15 @@ var (
 
 // Run runs the job against in the container engine
 func Run(job *db.Job, engine *docker.Engine) error {
+	valid, err := engine.ValidImage(job.Worker.DockerImage)
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		return errors.New("Invalid docker image")
+	}
+
 	container, err := engine.BuildContainer(job)
 	if err != nil {
 		return err

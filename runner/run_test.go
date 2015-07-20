@@ -99,3 +99,22 @@ func TestRunTimeout(t *testing.T) {
 	err = Run(job, engine)
 	assert.Equal(t, errTimeout.Error(), err.Error())
 }
+
+func TestRequiresAValidDockerImage(t *testing.T) {
+	setup()
+	defer clean()
+
+	job := &db.Job{
+		Worker: &db.Worker{
+			DockerImage: "dolaterio/yolo",
+			Cmd:         []string{"echo", "hello world"},
+		},
+	}
+	engine, err := docker.NewEngine()
+	assert.Nil(t, err)
+
+	err = Run(job, engine)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Invalid docker image", string(err.Error()))
+	assert.Equal(t, "", string(job.Stderr))
+}

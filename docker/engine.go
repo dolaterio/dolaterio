@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"strings"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -43,13 +44,14 @@ func NewEngine() (*Engine, error) {
 // ValidImage builds a Container to process the current request
 func (engine *Engine) ValidImage(imageName string) (bool, error) {
 	log.WithField("image", imageName).Info("Validating docker image")
-	images, err := engine.client.SearchImages(imageName)
+	imageNameWithoutTag := strings.SplitN(imageName, ":", 2)[0]
+	images, err := engine.client.SearchImages(imageNameWithoutTag)
 	if err != nil {
-		log.WithFields(logrus.Fields{"image": imageName, "err": err}).
+		log.WithFields(logrus.Fields{"image": imageNameWithoutTag, "err": err}).
 			Error("Error validating image")
 		return false, err
 	}
-	log.WithFields(logrus.Fields{"image": imageName, "found": len(images)}).
+	log.WithFields(logrus.Fields{"image": imageNameWithoutTag, "found": len(images)}).
 		Debug("Images found")
 	return len(images) > 0, nil
 }
