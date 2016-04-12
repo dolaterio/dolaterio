@@ -14,7 +14,7 @@ test:
 dependencies:
   pre:
     - docker run -d -p 28015:28015 -p 29015:29015 rethinkdb:2.0
-    - docker run --restart always -d -p 6379:6379 redis:2.8
+    - docker run -d -p 6379:6379 redis:2.8
     - docker pull dolaterio/dummy-worker
     - docker pull busybox
     - docker pull ubuntu:14.04
