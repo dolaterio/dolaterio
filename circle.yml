@@ -7,6 +7,8 @@ machine:
     RETHINKDB_PORT_28015_TCP_ADDR: localhost
     RETHINKDB_PORT_28015_TCP_PORT: 28015
     GODIST: "go1.6.linux-amd64.tar.gz"
+    IMPORT_PATH: "github.com/dolaterio/dolaterio"
+
   post:
     - mkdir -p download
     - test -e download/$GODIST || curl -o download/$GODIST https://storage.googleapis.com/golang/$GODIST
@@ -21,10 +23,13 @@ dependencies:
   cache_directories:
     - ~/download
   pre:
+    - go get github.com/tools/godep
+    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
+    - cp config_base.yml config.yml
+    - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
     - docker run -d -p 28015:28015 -p 29015:29015 rethinkdb:2.0
     - docker run -d -p 6380:6379 redis:2.8
     - docker pull dolaterio/dummy-worker
     - docker pull busybox
     - docker pull ubuntu:14.04
-    - make dep-install
-    - cp config_base.yml config.yml
+    - cd "$GOPATH/src/$IMPORT_PATH/" && make dep-install
