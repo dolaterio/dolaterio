@@ -3,7 +3,7 @@ machine:
     - docker
   environment:
     REDIS_PORT_6379_TCP_ADDR: localhost
-    REDIS_PORT_6379_TCP_PORT: 6379
+    REDIS_PORT_6379_TCP_PORT: 6380
     RETHINKDB_PORT_28015_TCP_ADDR: localhost
     RETHINKDB_PORT_28015_TCP_PORT: 28015
 
@@ -14,7 +14,7 @@ test:
 dependencies:
   pre:
     - docker run -d -p 28015:28015 -p 29015:29015 rethinkdb:2.0
-    - docker run -d -p 6379:6379 redis:2.8
+    - docker run -d -p 6380:6379 redis:2.8
     - docker pull dolaterio/dummy-worker
     - docker pull busybox
     - docker pull ubuntu:14.04
