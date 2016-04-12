@@ -1,4 +1,4 @@
 dolaterio
-Godeps/_workspace
+vendor
 config.yml
 *.bin

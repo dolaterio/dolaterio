@@ -20,18 +20,8 @@ worker.bin:
 migrate.bin:
 	CGO_ENABLED=0 GOOS=linux go build -a -o migrate.bin ./migrate
 clean:
-	if [ -a api.bin ] ; \
-	then \
-	     rm api.bin ; \
-	fi; \
-	if [ -a migrate.bin ] ; \
-	then \
-	     rm migrate.bin ; \
-	fi;
-	if [ -a worker.bin ] ; \
-	then \
-	     rm worker.bin ; \
-	fi;
+	rm -f *.bin
+
 build_image: clean api.bin migrate.bin worker.bin
 	docker build -t dolaterio/dolaterio .
 
