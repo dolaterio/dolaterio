@@ -23,13 +23,13 @@ dependencies:
   cache_directories:
     - ~/download
   pre:
-    - go get github.com/tools/godep
-    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
     - cp config_base.yml config.yml
+    - mkdir -p "$GOPATH/src/$IMPORT_PATH"
     - rsync -azC --delete ./ "$GOPATH/src/$IMPORT_PATH/"
+    - go get github.com/tools/godep
+    - cd "$GOPATH/src/$IMPORT_PATH/" && godep restore
     - docker run -d -p 28015:28015 -p 29015:29015 rethinkdb:2.0
     - docker run -d -p 6380:6379 redis:2.8
     - docker pull dolaterio/dummy-worker
     - docker pull busybox
     - docker pull ubuntu:14.04
-    - cd "$GOPATH/src/$IMPORT_PATH/" && make dep-install
