@@ -1,7 +1,5 @@
 # Dolater.io
 
-[![Circle CI](https://circleci.com/gh/dolaterio/dolaterio.svg?style=svg)](https://circleci.com/gh/dolaterio/dolaterio)
-
 Dolater.io lets you execute background jobs on a remote docker server.
 
 # How to run it
