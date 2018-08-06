@@ -1,5 +1,7 @@
 # Dolater.io
 
+THIS PROJECT IS NO LONGER MAINTAINED. Contact @acroca if you have any question.
+
 Dolater.io lets you execute background jobs on a remote docker server.
 
 # How to run it
